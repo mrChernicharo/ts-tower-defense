@@ -1,5 +1,5 @@
-import { StagesList } from "./classes/StagesList";
-import { Player } from "./Player";
+import { StagesList } from "../classes/StagesList";
+import { Player } from "../classes/Player";
 
 const player = new Player();
 

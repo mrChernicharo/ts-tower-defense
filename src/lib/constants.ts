@@ -1,5 +1,5 @@
 // import { svg } from "./dom-selects";
-import { WaveDefinition } from "./WaveDefinition";
+import { WaveDefinition } from "../classes/WaveDefinition";
 
 export const FPS = 15;
 export const EXPLOSION_RADIUS = 30;
@@ -284,7 +284,7 @@ export const STAGES_AND_WAVES = {
   },
   4: {
     stage: {
-      number: 2,
+      number: 4,
       name: "Lapa boulevard",
       firstWaveAtRow: 3,
       entrypoint: 3,
@@ -306,7 +306,7 @@ export const STAGES_AND_WAVES = {
   },
   5: {
     stage: {
-      number: 2,
+      number: 5,
       name: "Piemont Square",
       firstWaveAtRow: 2,
       entrypoint: 1,

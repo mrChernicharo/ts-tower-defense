@@ -1,4 +1,10 @@
-import { initialGold, initialEmeralds, initialCastleHP } from "./constants";
+import {
+  initialGold,
+  initialEmeralds,
+  initialCastleHP,
+  STAGES_AND_WAVES,
+} from "../lib/constants";
+import { stage_name_span, stage_number_span } from "../lib/DOM_elements";
 
 export class Game {
   // frameId = 0;
@@ -25,8 +31,12 @@ export class Game {
   // wavesTimes = [{ start: 0; end: null }];
   // gameSpeed = 2;
 
-  constructor(stageInfo: any) {}
+  constructor(
+    stageInfo: typeof STAGES_AND_WAVES[keyof typeof STAGES_AND_WAVES]
+  ) {
+    console.log({ stageInfo });
 
-  #createGrid() {}
-
+    stage_number_span.textContent = `Stage ${stageInfo.stage.number}`;
+    stage_name_span.textContent = `${stageInfo.stage.name}`;
+  }
 }

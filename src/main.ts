@@ -1,9 +1,14 @@
-import { btn } from "./DOM_elements";
-import { Player } from "./Player";
+import { addStarsBtn, levelUpBtn, spend5StarsBtn } from "./lib/DOM_elements";
+import { Player } from "./classes/Player";
 
 export const player = new Player();
 
-btn.onclick = (e: MouseEvent) => {
+levelUpBtn.onclick = (e: MouseEvent) => {
   player.levelUp();
-  console.log(e, player);
+};
+addStarsBtn.onclick = (e: MouseEvent) => {
+  player.earnStars(2);
+};
+spend5StarsBtn.onclick = (e: MouseEvent) => {
+  player.spendStars(5);
 };

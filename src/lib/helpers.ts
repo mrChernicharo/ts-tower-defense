@@ -15,4 +15,5 @@ export function getStageNumberFromUrl() {
       return Number(v);
     }
   }
+  return 1;
 }

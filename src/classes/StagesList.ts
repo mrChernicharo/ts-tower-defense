@@ -1,4 +1,4 @@
-import { stages_list_ul } from "../DOM_elements";
+import { stages_list_ul } from "../lib/DOM_elements";
 
 export class StagesList {
   #playerLevel: number;
