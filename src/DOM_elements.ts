@@ -6,3 +6,4 @@ export const player_level_div = document.querySelector(
 ) as HTMLDivElement;
 
 export const btn = document.querySelector("#level-up-btn") as HTMLButtonElement;
+export const stages_list_ul = document.querySelector("#stages-list-ul") as HTMLUListElement;
