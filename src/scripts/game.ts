@@ -11,4 +11,4 @@ const stageInfo = STAGES_AND_WAVES[stageNumber];
 
 const game = new Game(stageInfo);
 
-console.log(player);
+console.log(player, game);
