@@ -1,3 +1,5 @@
+import { play_pause_btn } from "../lib/DOM_elements";
+
 let counter = 0;
 export class Clock {
   #speed = 1;
@@ -10,11 +12,14 @@ export class Clock {
 
   play() {
     this.isPlaying = true;
+    play_pause_btn.textContent = "⏸";
+
     this.step();
   }
   pause() {
     cancelAnimationFrame(this.#frame);
     this.isPlaying = false;
+    play_pause_btn.textContent = "▶️";
   }
   reset() {
     this.#frame = 0;

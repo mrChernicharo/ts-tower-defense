@@ -33,6 +33,12 @@ export class RingMenu {
       this.#removeRingButtons();
       this.hide();
     });
+
+    document.addEventListener("on-wave-end", () => {
+      if (this.#game.selectedTile) {
+        this.#appendRingButtons(this.#game.selectedTile)
+      }
+    });
   }
 
   #draw() {
@@ -43,7 +49,8 @@ export class RingMenu {
     path.setAttribute("stroke", "#245");
     path.setAttribute("fill", "none");
     path.setAttribute(
-      "d",`
+      "d",
+      `
       M ${TILE_WIDTH * 1.5} ${TILE_WIDTH * 0.75} 
       A ${TILE_WIDTH * 0.75}  ${TILE_WIDTH * 0.75} 0 1 1 ${TILE_WIDTH * 1.5} ${TILE_WIDTH * 0.7499}`
     );
@@ -55,7 +62,9 @@ export class RingMenu {
   #appendRingButtons(tile: Tile) {
     if (tile.getMenuType()) {
       const buttons = this.#drawRingButtons(tile);
-      this.#attachButtonsListeners(buttons, tile);
+      if (buttons) {
+        this.#attachButtonsListeners(buttons, tile);
+      }
     }
   }
 
@@ -65,6 +74,9 @@ export class RingMenu {
     const buttons: SVGCircleElement[] = [];
     for (const [i, menuButton] of RING_MENU_ICONS[menuType].entries()) {
       if (menuType === "newPath") {
+        // don't add  newPath buttons if inBattle
+        if (this.#game.inBattle) return;
+
         const iconDirection = menuButton.type.split("-")[1] as IconDirection;
         const adjacentTile = this.#game.getAdjacentTile(tile, iconDirection);
         const isBuildableAdj =
@@ -99,15 +111,15 @@ export class RingMenu {
       defs.setAttribute("class", "defs");
 
       pattern.setAttribute("id", patternId);
-      pattern.setAttribute("width", TILE_WIDTH * 0.28 + 'px');
-      pattern.setAttribute("height", TILE_WIDTH * 0.28 + 'px');
+      pattern.setAttribute("width", TILE_WIDTH * 0.28 + "px");
+      pattern.setAttribute("height", TILE_WIDTH * 0.28 + "px");
 
       image.setAttribute("href", menuButton.img);
       image.setAttribute("id", `image-${menuButton.id}`);
-      image.setAttribute("x", TILE_WIDTH * 0.06 + 'px');
-      image.setAttribute("y",  TILE_WIDTH * 0.06 + 'px');
-      image.setAttribute("width", TILE_WIDTH * 0.28 + 'px');
-      image.setAttribute("height", TILE_WIDTH * 0.28 + 'px');
+      image.setAttribute("x", TILE_WIDTH * 0.06 + "px");
+      image.setAttribute("y", TILE_WIDTH * 0.06 + "px");
+      image.setAttribute("width", TILE_WIDTH * 0.28 + "px");
+      image.setAttribute("height", TILE_WIDTH * 0.28 + "px");
 
       // if (menuType === "newTower" && !canAfford(TOWERS[menuIcon.type].price)) {
       //   image.setAttribute("style", "filter: grayscale(1)");

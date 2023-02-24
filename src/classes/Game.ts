@@ -30,7 +30,7 @@ export class Game {
   #selectedTile: Tile | null = null;
   #lastSelectedTile: Tile | null = null;
   // isPlaying = false;
-  // inBattle = false;
+  #inBattle = false;
   // towerPreviewActive = false;
   #stageName: string;
   #stageNumber: number;
@@ -82,6 +82,12 @@ export class Game {
   get rows() {
     return this.#rows;
   }
+  get inBattle() {
+    return this.#inBattle;
+  }
+  get selectedTile() {
+    return this.#selectedTile;
+  }
 
   #createGrid() {
     // set scene size
@@ -132,7 +138,7 @@ export class Game {
       if (!(e.target as HTMLElement).dataset.entity) {
         // console.log("clicked outside", e);
         this.#lastSelectedTile = this.#selectedTile;
-        // blur selected tile
+
         this.#selectedTile?.blur();
         this.#selectedTile = null;
         return;
@@ -142,18 +148,15 @@ export class Game {
     document.addEventListener("tile-clicked", (e: CustomEvent<Tile>) => {
       this.#lastSelectedTile = this.#selectedTile;
       this.#selectedTile = e.detail;
-      // console.log("tile-clicked", { last: this.#lastSelectedTile, curr: this.#selectedTile });
 
       if (this.#selectedTile?.id === this.#lastSelectedTile?.id) {
         // console.log("clicked same tile!");
-        // blur selected tile
         this.#selectedTile.blur();
         this.#selectedTile = null;
         return;
       }
 
       // console.log("clicked different tile!");
-      // focus selectedTile, blur lastSelectedTile
       this.#lastSelectedTile?.blur();
       this.#selectedTile.focus();
     });
@@ -176,12 +179,10 @@ export class Game {
 
     play_pause_btn.onclick = (e: MouseEvent) => {
       if (this.#clock.isPlaying) {
-        (e.target as any).textContent = "▶️";
         this.#clock.pause();
         return;
       }
 
-      (e.target as any).textContent = "⏸";
       this.#clock.play();
       return;
     };
@@ -219,8 +220,11 @@ export class Game {
       direction === "bottom" && nextTile.pos.y / TILE_WIDTH + 1 > this.#firstWaveAtRow + this.#waveNumber;
 
     if (barrierBroken) {
-      this.updateTilesVisibility();
-      this.#waveLine++;
+      this.#onWaveStart();
+
+      setTimeout(() => {
+        this.#onWaveEnd();
+      }, 2000);
     }
   }
 
@@ -252,5 +256,21 @@ export class Game {
     affectedTiles.forEach(t => {
       t.setVisibility(true);
     });
+  }
+
+  #onWaveStart() {
+    this.updateTilesVisibility();
+    this.#waveLine++;
+    this.#inBattle = true;
+    this.#clock.play();
+    play_pause_btn.removeAttribute("disabled");
+  }
+
+  #onWaveEnd() {
+    this.#inBattle = false;
+    this.#clock.pause();
+    play_pause_btn.setAttribute("disabled", "ok");
+    const onWaveEnd = new CustomEvent("on-wave-end", { detail: null });
+    document.dispatchEvent(onWaveEnd)
   }
 }
