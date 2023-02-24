@@ -75,11 +75,10 @@ export class Tile {
     this.#image = document.createElementNS("http://www.w3.org/2000/svg", "image");
 
     this.#drawTile();
+    this.#attachEvents();
   }
 
   #drawTile() {
-
-
     const patternId = `_tile-pattern-${this.#id}`;
 
     this.#shape.setAttribute("id", this.#id);
@@ -106,6 +105,13 @@ export class Tile {
     this.#pattern.append(this.#image);
     scene.append(this.#defs);
     scene.append(this.#shape);
+  }
+
+  #attachEvents() {
+    this.#shape.onpointerup = (e: PointerEvent) => {
+      const tileClick = new CustomEvent("tile-clicked", { detail: this });
+      document.dispatchEvent(tileClick);
+    };
   }
 
   focus() {}

@@ -55,6 +55,7 @@ export class Game {
     stage_name_span.textContent = `${this.#stageName}`;
 
     this.#tiles = this.#createGrid();
+    this.#appendEventListeners();
   }
 
   #createGrid() {
@@ -97,5 +98,11 @@ export class Game {
       }
     }
     return tiles;
+  }
+
+  #appendEventListeners() {
+    document.addEventListener("tile-clicked", (e: CustomEvent<Tile>) => {
+      console.log(e, e.detail);
+    });
   }
 }
