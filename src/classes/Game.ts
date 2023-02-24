@@ -13,7 +13,7 @@ export class Game {
   // enemies = [];
   // towers = [];
   // bullets = [];
-  tiles: Tile[] = [];
+  #tiles: Tile[];
   // bulletCount = 0;
   // tileChain = [];
   // selectedTile = null;
@@ -54,7 +54,7 @@ export class Game {
     stage_number_span.textContent = `Stage ${this.#stageNumber}`;
     stage_name_span.textContent = `${this.#stageName}`;
 
-    this.#createGrid();
+    this.#tiles = this.#createGrid();
   }
 
   #createGrid() {
@@ -62,8 +62,6 @@ export class Game {
     svg.setAttribute("width", String((this.#cols + 1) * TILE_WIDTH));
     svg.setAttribute("height", String((this.#rows + 1) * TILE_WIDTH));
 
-    scene.setAttribute("width", String(this.#cols * TILE_WIDTH));
-    scene.setAttribute("height", String(this.#rows * TILE_WIDTH));
     scene.setAttribute("style", `transform: translate(${TILE_WIDTH / 2}px, ${TILE_WIDTH / 2}px)`);
 
     const isInitialPath = (row: number, col: number) => row == 0 && col == this.#entrypoint;
@@ -98,6 +96,6 @@ export class Game {
         tiles.push(new Tile(tileId, tileIdx, tilePos, tileType));
       }
     }
-    console.log(tiles);
+    return tiles;
   }
 }

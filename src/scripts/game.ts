@@ -10,5 +10,6 @@ const stageNumber = getStageNumberFromUrl() as StageKeys;
 const stageInfo = STAGES_AND_WAVES[stageNumber];
 
 const game = new Game(stageInfo);
+// new GameEvents();
 
 console.log(player, game);

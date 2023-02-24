@@ -52,6 +52,10 @@ export class Tile {
   #index: number;
   #pos: Pos;
   #type: TileType;
+  #shape: SVGRectElement;
+  #defs: SVGDefsElement;
+  #pattern: SVGPatternElement;
+  #image: SVGImageElement;
   connected = false;
   hasTower = false;
   isBlocked = false;
@@ -65,41 +69,43 @@ export class Tile {
     this.#pos = pos;
     this.#type = type;
 
+    this.#shape = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    this.#defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+    this.#pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern");
+    this.#image = document.createElementNS("http://www.w3.org/2000/svg", "image");
+
     this.#drawTile();
   }
 
   #drawTile() {
-    const shape = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-    const pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern");
-    const image = document.createElementNS("http://www.w3.org/2000/svg", "image");
+
 
     const patternId = `_tile-pattern-${this.#id}`;
 
-    shape.setAttribute("id", this.#id);
-    shape.setAttribute("data-entity", "tile");
-    shape.setAttribute("data-index", String(this.#index));
-    shape.setAttribute("x", String(this.#pos.x));
-    shape.setAttribute("y", String(this.#pos.y));
-    shape.setAttribute("height", TILE_WIDTH + "px");
-    shape.setAttribute("width", TILE_WIDTH + "px");
-    shape.setAttribute("opacity", "1");
-    shape.setAttribute("fill", `url(#${patternId})`);
+    this.#shape.setAttribute("id", this.#id);
+    this.#shape.setAttribute("data-entity", "tile");
+    this.#shape.setAttribute("data-index", String(this.#index));
+    this.#shape.setAttribute("x", String(this.#pos.x));
+    this.#shape.setAttribute("y", String(this.#pos.y));
+    this.#shape.setAttribute("height", TILE_WIDTH + "px");
+    this.#shape.setAttribute("width", TILE_WIDTH + "px");
+    this.#shape.setAttribute("opacity", "1");
+    this.#shape.setAttribute("fill", `url(#${patternId})`);
 
-    defs.setAttribute("id", `defs-${this.#id}`);
-    defs.setAttribute("class", "defs tile-defs");
-    pattern.setAttribute("id", patternId);
-    pattern.setAttribute("width", "1");
-    pattern.setAttribute("height", "1");
-    image.setAttribute("id", `image-${this.id}`);
-    image.setAttribute("href", TileAssets[this.type]);
-    image.setAttribute("height", TILE_WIDTH + "px");
-    image.setAttribute("width", TILE_WIDTH + "px");
+    this.#defs.setAttribute("id", `defs-${this.#id}`);
+    this.#defs.setAttribute("class", "defs tile-defs");
+    this.#pattern.setAttribute("id", patternId);
+    this.#pattern.setAttribute("width", "1");
+    this.#pattern.setAttribute("height", "1");
+    this.#image.setAttribute("id", `image-${this.id}`);
+    this.#image.setAttribute("href", TileAssets[this.type]);
+    this.#image.setAttribute("height", TILE_WIDTH + "px");
+    this.#image.setAttribute("width", TILE_WIDTH + "px");
 
-    defs.append(pattern);
-    pattern.append(image);
-    scene.append(defs);
-    scene.append(shape);
+    this.#defs.append(this.#pattern);
+    this.#pattern.append(this.#image);
+    scene.append(this.#defs);
+    scene.append(this.#shape);
   }
 
   focus() {}

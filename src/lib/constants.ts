@@ -223,6 +223,7 @@ export const STAGES_AND_WAVES = {
       // blockedTiles[row][col]
       5: [2],
       6: [3],
+      7: [2, 3],
     },
     wallTiles: {
       0: [3],
