@@ -25,3 +25,6 @@ export const enemy_lane_paths = {
   center: document.querySelector("#enemy-lane-center")!,
   right: document.querySelector("#enemy-lane-right")!,
 };
+
+export const game_speed_form = document.querySelector("#game-speed-form") as HTMLFormElement;
+export const play_pause_btn = document.querySelector('#play-pause-btn') as HTMLButtonElement

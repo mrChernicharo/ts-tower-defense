@@ -1,6 +1,15 @@
 import { STAGES_AND_WAVES, TILE_WIDTH } from "../lib/constants";
-import { enemy_lane_paths, scene, stage_name_span, stage_number_span, svg } from "../lib/DOM_elements";
+import {
+  enemy_lane_paths,
+  game_speed_form,
+  play_pause_btn,
+  scene,
+  stage_name_span,
+  stage_number_span,
+  svg,
+} from "../lib/DOM_elements";
 import { drawPath } from "../lib/helpers";
+import { Clock } from "./Clock";
 import { IconDirection } from "./RingMenu";
 import { Pos, Tile, TileType } from "./Tile";
 
@@ -34,10 +43,11 @@ export class Game {
   #firstWaveAtRow: number;
   #waveLine: number;
   #waveNumber = 0;
+  #clock: Clock;
   // wavesTimes = [{ start: 0; end: null }];
   // gameSpeed = 2;
 
-  constructor(stageInfo: StageInfo) {
+  constructor(stageInfo: StageInfo, clock: Clock) {
     console.log({ stageInfo });
     const { stage, blockedTiles, wallTiles, waves } = stageInfo;
     const { name, number, cols, rows, baseTile, entrypoint, firstWaveAtRow } = stage;
@@ -60,8 +70,10 @@ export class Game {
 
     this.tiles = this.#createGrid();
     this.tileChain = [this.tiles.find(t => t.isStartingPoint)!];
-    console.log(this);
     this.#appendEventListeners();
+
+    this.#clock = clock;
+    console.log(this);
   }
 
   get cols() {
@@ -118,7 +130,7 @@ export class Game {
   #appendEventListeners() {
     document.addEventListener("click", (e: MouseEvent) => {
       if (!(e.target as HTMLElement).dataset.entity) {
-        console.log("clicked outside", e);
+        // console.log("clicked outside", e);
         this.#lastSelectedTile = this.#selectedTile;
         // blur selected tile
         this.#selectedTile?.blur();
@@ -145,6 +157,34 @@ export class Game {
       this.#lastSelectedTile?.blur();
       this.#selectedTile.focus();
     });
+
+    game_speed_form.onchange = (e: Event) => {
+      e.preventDefault();
+
+      switch ((e.target as any).value) {
+        case "normal":
+          this.#clock.changeSpeed(1);
+          break;
+        case "fast":
+          this.#clock.changeSpeed(2);
+          break;
+        case "faster":
+          this.#clock.changeSpeed(4);
+          break;
+      }
+    };
+
+    play_pause_btn.onclick = (e: MouseEvent) => {
+      if (this.#clock.isPlaying) {
+        (e.target as any).textContent = "▶️";
+        this.#clock.pause();
+        return;
+      }
+
+      (e.target as any).textContent = "⏸";
+      this.#clock.play();
+      return;
+    };
   }
 
   getAdjacentTile(tile: Tile, direction: IconDirection): Tile | null {

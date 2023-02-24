@@ -62,7 +62,7 @@ export class RingMenu {
   #drawRingButtons(tile: Tile) {
     const menuType = tile.getMenuType()!;
 
-    const buttons = [];
+    const buttons: SVGCircleElement[] = [];
     for (const [i, menuButton] of RING_MENU_ICONS[menuType].entries()) {
       if (menuType === "newPath") {
         const iconDirection = menuButton.type.split("-")[1] as IconDirection;
