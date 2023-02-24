@@ -2,6 +2,9 @@ import { Tile } from "../classes/Tile";
 
 interface CustomEventMap {
   "tile-clicked": CustomEvent<Tile>;
+  "show-ring-menu": CustomEvent<Tile>;
+  "hide-ring-menu": CustomEvent<Tile>;
+  
 }
 //adds definition to Document
 declare global {

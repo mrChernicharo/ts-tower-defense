@@ -2,6 +2,7 @@ import { getStageNumberFromUrl } from "../lib/helpers";
 import { Player } from "../classes/Player";
 import { Game } from "../classes/Game";
 import { STAGES_AND_WAVES } from "../lib/constants";
+import { RingMenu } from "../classes/RingMenu";
 
 type StageKeys = keyof typeof STAGES_AND_WAVES;
 
@@ -10,6 +11,6 @@ const stageNumber = getStageNumberFromUrl() as StageKeys;
 const stageInfo = STAGES_AND_WAVES[stageNumber];
 
 const game = new Game(stageInfo);
-// new GameEvents();
+const ringMenu = new RingMenu();
 
 console.log(player, game);

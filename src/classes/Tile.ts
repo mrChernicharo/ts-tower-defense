@@ -1,5 +1,5 @@
 import { TILE_WIDTH } from "../lib/constants";
-import { scene } from "../lib/DOM_elements";
+import { scene, tiles_g } from "../lib/DOM_elements";
 
 export interface Pos {
   x: number;
@@ -103,8 +103,8 @@ export class Tile {
 
     this.#defs.append(this.#pattern);
     this.#pattern.append(this.#image);
-    scene.append(this.#defs);
-    scene.append(this.#shape);
+    tiles_g.append(this.#defs);
+    tiles_g.append(this.#shape);
   }
 
   #attachEvents() {
@@ -114,8 +114,23 @@ export class Tile {
     };
   }
 
-  focus() {}
-  blur() {}
+  focus() {
+    this.#shape.setAttribute("opacity", "0.4");
+    this.#shape.setAttribute("style", `filter: drop-shadow(0 0 12px #88f);`);
+    const showRingMenu = new CustomEvent("show-ring-menu", { detail: this });
+    document.dispatchEvent(showRingMenu);
+  }
+  blur() {
+    this.#shape.setAttribute("opacity", "1");
+    this.#shape.setAttribute("style", `filter: drop-shadow(0 0 0 #88f);`);
+    const hideRingMenu = new CustomEvent("hide-ring-menu", { detail: this });
+    document.dispatchEvent(hideRingMenu);
+    // let waveLine = G.waveNumber + STAGES_AND_WAVES[G.stageNumber].stage.firstWaveAtRow;
+    // const afterWaveLineAndInvisible = row >= waveLine && !this.visible && !this.enemyEntrance;
+
+    // this.shape.setAttribute("opacity", afterWaveLineAndInvisible ? 0.4 : 1);
+    // this.shape.setAttribute("style", `filter: drop-shadow(0 0 0 #88f);`);
+  }
 
   get id() {
     return this.#id;

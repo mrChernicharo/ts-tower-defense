@@ -16,8 +16,8 @@ export class Game {
   #tiles: Tile[];
   // bulletCount = 0;
   // tileChain = [];
-  // selectedTile = null;
-  // lastSelectedTile = null;
+  #selectedTile: Tile | null = null;
+  #lastSelectedTile: Tile | null = null;
   // isPlaying = false;
   // inBattle = false;
   // towerPreviewActive = false;
@@ -101,8 +101,34 @@ export class Game {
   }
 
   #appendEventListeners() {
+    document.addEventListener("click", (e: MouseEvent) => {
+      if (!(e.target as HTMLElement).dataset.entity) {
+        console.log("clicked outside", e);
+        this.#lastSelectedTile = this.#selectedTile;
+        // blur selected tile
+        this.#selectedTile?.blur();
+        this.#selectedTile = null;
+        return;
+      }
+    });
+
     document.addEventListener("tile-clicked", (e: CustomEvent<Tile>) => {
-      console.log(e, e.detail);
+      this.#lastSelectedTile = this.#selectedTile;
+      this.#selectedTile = e.detail;
+      // console.log("tile-clicked", { last: this.#lastSelectedTile, curr: this.#selectedTile });
+
+      if (this.#selectedTile?.id === this.#lastSelectedTile?.id) {
+        // console.log("clicked same tile!");
+        // blur selected tile
+        this.#selectedTile.blur();
+        this.#selectedTile = null;
+        return;
+      }
+
+      // console.log("clicked different tile!");
+      // focus selectedTile, blur lastSelectedTile
+      this.#lastSelectedTile?.blur();
+      this.#selectedTile.focus();
     });
   }
 }
