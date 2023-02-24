@@ -224,7 +224,7 @@ export class Game {
 
       setTimeout(() => {
         this.#onWaveEnd();
-      }, 2000);
+      }, 4000);
     }
   }
 
@@ -247,6 +247,7 @@ export class Game {
     enemy_lane_paths.center.setAttribute("d", drawPath(chains.center, "center"));
     enemy_lane_paths.right.setAttribute("d", drawPath(chains.right, "right"));
   }
+
   updateTilesVisibility() {
     const affectedTiles = this.tiles.filter(t => {
       const tileRow = Number(t.id.split("-")[1]) / TILE_WIDTH;

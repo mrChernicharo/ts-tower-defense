@@ -4,6 +4,7 @@ import { Game } from "../classes/Game";
 import { STAGES_AND_WAVES } from "../lib/constants";
 import { RingMenu } from "../classes/RingMenu";
 import { Clock } from "../classes/Clock";
+import { Enemy } from "../classes/Enemy";
 
 type StageKeys = keyof typeof STAGES_AND_WAVES;
 
@@ -17,9 +18,9 @@ const clock = new Clock(clockCallback);
 const game = new Game(stageInfo, clock);
 new RingMenu(game);
 
+const enemy = new Enemy({ x: 250, y: 300 }, "goblin", "center");
 
-
-console.log(player, game, clock);
+console.log(player, game, clock, enemy);
 
 // clock.play();
 
