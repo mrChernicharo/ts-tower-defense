@@ -1,6 +1,6 @@
 import { STAGES_AND_WAVES, TILE_WIDTH } from "../lib/constants";
 import { scene, stage_name_span, stage_number_span, svg } from "../lib/DOM_elements";
-import { Tile } from "./Tile";
+import { Tile, TileType } from "./Tile";
 
 type StageInfo = typeof STAGES_AND_WAVES[keyof typeof STAGES_AND_WAVES];
 
@@ -64,7 +64,7 @@ export class Game {
 
     scene.setAttribute("width", String(this.#cols * TILE_WIDTH));
     scene.setAttribute("height", String(this.#rows * TILE_WIDTH));
-    scene.setAttribute("transform", `translate(${TILE_WIDTH / 2}px, ${TILE_WIDTH / 2}px)`);
+    scene.setAttribute("style", `transform: translate(${TILE_WIDTH / 2}px, ${TILE_WIDTH / 2}px)`);
 
     const isInitialPath = (row: number, col: number) => row == 0 && col == this.#entrypoint;
 
@@ -74,17 +74,30 @@ export class Game {
     const isWall = (row: number, col: number) => Boolean(this.#wallTiles[row] && this.#wallTiles[row].includes(col));
 
     const getTileType = (isStartingPoint: boolean) => {
-      if (isStartingPoint) return "path";
+      if (isStartingPoint) return `${this.#baseTile}-path-initial`;
       else return this.#baseTile;
     };
 
-    const tiles = [];
+    const tiles: Tile[] = [];
+    for (let row of Array(this.#rows)
+      .fill(null)
+      .map((_, i) => i)) {
+      for (let col of Array(this.#cols)
+        .fill(null)
+        .map((_, i) => i)) {
+        const tilePos = { x: col * TILE_WIDTH, y: row * TILE_WIDTH };
 
-    for (let row of Array(this.#rows).fill(null).map((_, i) => i)) {
-      for (let col of Array(this.#cols).fill(null).map((_, i) => i)) {
-        
-        const pos = { x: col * TILE_WIDTH, y: row * TILE_WIDTH };
+        const tileId = `tile-${tilePos.y}-${tilePos.x}`;
+        const tileIdx = row * this.#cols + col;
+
+        const isStartingPoint = isInitialPath(row, col);
+        const tileBlocked = isBlocked(row, col);
+
+        const tileType = (tileBlocked ? "lava" : isWall(row, col) ? "rock" : getTileType(isStartingPoint)) as TileType;
+
+        tiles.push(new Tile(tileId, tileIdx, tilePos, tileType));
       }
     }
+    console.log(tiles);
   }
 }
