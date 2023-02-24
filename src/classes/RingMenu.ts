@@ -39,10 +39,14 @@ export class RingMenu {
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
     path.id = "ring-menu";
     path.setAttribute("height", TILE_WIDTH * 1.5 + "px");
-    path.setAttribute("stroke-width", "10px");
+    path.setAttribute("stroke-width", TILE_WIDTH * 0.1 + "px");
     path.setAttribute("stroke", "#245");
     path.setAttribute("fill", "none");
-    path.setAttribute("d", "M 150 75 A 75 75 0 1 1 150 74.99");
+    path.setAttribute(
+      "d",`
+      M ${TILE_WIDTH * 1.5} ${TILE_WIDTH * 0.75} 
+      A ${TILE_WIDTH * 0.75}  ${TILE_WIDTH * 0.75} 0 1 1 ${TILE_WIDTH * 1.5} ${TILE_WIDTH * 0.7499}`
+    );
     path.setAttribute("opacity", "0");
     // path.setAttribute("style", `transform: translate(-${ringOffset}px, -${ringOffset}px)`);
     return path;
@@ -86,7 +90,7 @@ export class RingMenu {
       circle.setAttribute("id", menuButton.id);
       circle.setAttribute("cx", String(tile.pos.x + menuButton.x - ringOffset));
       circle.setAttribute("cy", String(tile.pos.y + menuButton.y - ringOffset));
-      circle.setAttribute("r", "20");
+      circle.setAttribute("r", TILE_WIDTH * 0.2 + "px");
       circle.setAttribute("stroke", ringColor);
       circle.setAttribute("stroke-width", "2");
       circle.setAttribute("fill", `url(#${patternId})`);
@@ -95,15 +99,15 @@ export class RingMenu {
       defs.setAttribute("class", "defs");
 
       pattern.setAttribute("id", patternId);
-      pattern.setAttribute("width", "28");
-      pattern.setAttribute("height", "28");
+      pattern.setAttribute("width", TILE_WIDTH * 0.28 + 'px');
+      pattern.setAttribute("height", TILE_WIDTH * 0.28 + 'px');
 
       image.setAttribute("href", menuButton.img);
       image.setAttribute("id", `image-${menuButton.id}`);
-      image.setAttribute("x", "6");
-      image.setAttribute("y", "6");
-      image.setAttribute("width", "28");
-      image.setAttribute("height", "28");
+      image.setAttribute("x", TILE_WIDTH * 0.06 + 'px');
+      image.setAttribute("y",  TILE_WIDTH * 0.06 + 'px');
+      image.setAttribute("width", TILE_WIDTH * 0.28 + 'px');
+      image.setAttribute("height", TILE_WIDTH * 0.28 + 'px');
 
       // if (menuType === "newTower" && !canAfford(TOWERS[menuIcon.type].price)) {
       //   image.setAttribute("style", "filter: grayscale(1)");
@@ -152,7 +156,10 @@ export class RingMenu {
   }
 
   translate(pos: Pos) {
-    this.#path.setAttribute("style", `transform: translate(${pos.x - ringOffset}px, ${pos.y - ringOffset}px); pointer-events: none;`);
+    this.#path.setAttribute(
+      "style",
+      `transform: translate(${pos.x - ringOffset}px, ${pos.y - ringOffset}px); pointer-events: none;`
+    );
   }
   show() {
     this.#path.setAttribute("opacity", "0.5");

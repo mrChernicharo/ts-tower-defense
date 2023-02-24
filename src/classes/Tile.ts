@@ -196,8 +196,8 @@ export class Tile {
 
     if (this.isStartingPoint || !prevTile) {
       const left = { x: this.pos.x + TILE_WIDTH * 0.25, y: 0 };
-      const center = { x: this.pos.x + 50, y: 0 };
-      const right = { x: this.pos.x + 75, y: 0 };
+      const center = { x: this.pos.x + TILE_WIDTH * 0.5, y: 0 };
+      const right = { x: this.pos.x + TILE_WIDTH * 0.75, y: 0 };
       // G.tileChain.push({ ...tile, exits });
       return { left, center, right };
     }

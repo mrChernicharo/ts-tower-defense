@@ -210,7 +210,6 @@ export class Game {
     });
 
     affectedTiles.forEach(t => {
-      console.log(t);
       t.setVisibility(true);
     });
   }
