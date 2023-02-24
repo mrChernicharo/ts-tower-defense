@@ -13,6 +13,8 @@ export interface TileExits {
   right: Pos;
 }
 
+export type EnemyLane = 'left' | 'center' | 'right'
+
 export type TileType =
   | "grass"
   | "dirt"

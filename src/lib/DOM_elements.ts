@@ -19,3 +19,9 @@ export const addStarsBtn = document.querySelector("#add-stars-btn") as HTMLButto
 export const spend5StarsBtn = document.querySelector("#spend-stars-btn") as HTMLButtonElement;
 
 export const stages_list_ul = document.querySelector("#stages-list-ul") as HTMLUListElement;
+
+export const enemy_lane_paths = {
+  left: document.querySelector("#enemy-lane-left")!,
+  center: document.querySelector("#enemy-lane-center")!,
+  right: document.querySelector("#enemy-lane-right")!,
+};

@@ -1,7 +1,8 @@
 import { STAGES_AND_WAVES, TILE_WIDTH } from "../lib/constants";
-import { scene, stage_name_span, stage_number_span, svg } from "../lib/DOM_elements";
+import { enemy_lane_paths, scene, stage_name_span, stage_number_span, svg } from "../lib/DOM_elements";
+import { drawPath } from "../lib/helpers";
 import { IconDirection } from "./RingMenu";
-import { Tile, TileType } from "./Tile";
+import { Pos, Tile, TileType } from "./Tile";
 
 type StageInfo = typeof STAGES_AND_WAVES[keyof typeof STAGES_AND_WAVES];
 
@@ -57,7 +58,7 @@ export class Game {
 
     this.tiles = this.#createGrid();
     this.tileChain = [this.tiles.find(t => t.isStartingPoint)!];
-    console.log(this)
+    console.log(this);
     this.#appendEventListeners();
   }
 
@@ -164,17 +165,38 @@ export class Game {
     const direction = button.dataset.type!.split("-")[1] as IconDirection;
     const nextTile = this.getAdjacentTile(tile, direction);
     const prevTile = this.tileChain.at(-1);
-    const exits = tile.getTileExits(prevTile);
-
-    console.log({ direction, adj: nextTile, prevTile, exits });
 
     if (!prevTile || !nextTile) return;
-    this.tiles[nextTile.index].becomePathEnd(prevTile)
-    this.tiles[prevTile.index].becomePathSegment(nextTile)
-    this.tileChain.push(nextTile)
-    console.log(this)
+    this.tiles[nextTile.index].becomePathEnd(prevTile);
+    this.tiles[prevTile.index].becomePathSegment(nextTile);
+    this.tileChain.push(nextTile);
 
+    this.updateEnemyLanes();
   }
 
-  
+  updateEnemyLanes() {
+    const chains = this.getTileChains();
+
+    enemy_lane_paths.left.setAttribute("d", drawPath(chains.left, "left"));
+    enemy_lane_paths.center.setAttribute("d", drawPath(chains.center, "center"));
+    enemy_lane_paths.right.setAttribute("d", drawPath(chains.right, "right"));
+  }
+
+  getTileChains() {
+    type Acc = { left: Pos[]; center: Pos[]; right: Pos[] };
+
+    return this.tileChain.reduce(
+      (acc: Acc, tile) => {
+        acc.left.push(tile.exits!.left);
+        acc.center.push(tile.exits!.center);
+        acc.right.push(tile.exits!.right);
+        return acc;
+      },
+      {
+        left: [],
+        center: [],
+        right: [],
+      }
+    );
+  }
 }
