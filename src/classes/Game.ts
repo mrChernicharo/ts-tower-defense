@@ -83,7 +83,7 @@ export class Game {
     const isWall = (row: number, col: number) => Boolean(this.#wallTiles[row] && this.#wallTiles[row].includes(col));
 
     const getTileType = (isStartingPoint: boolean) => {
-      if (isStartingPoint) return `${this.#baseTile}-path-initial`;
+      if (isStartingPoint) return `${this.#baseTile}-path-end-B`;
       else return this.#baseTile;
     };
 
@@ -162,11 +162,19 @@ export class Game {
 
   createNewPath(tile: Tile, button: SVGCircleElement) {
     const direction = button.dataset.type!.split("-")[1] as IconDirection;
-    const adj = this.getAdjacentTile(tile, direction);
-
+    const nextTile = this.getAdjacentTile(tile, direction);
     const prevTile = this.tileChain.at(-1);
     const exits = tile.getTileExits(prevTile);
 
-    console.log({ direction, adj, prevTile, exits });
+    console.log({ direction, adj: nextTile, prevTile, exits });
+
+    if (!prevTile || !nextTile) return;
+    this.tiles[nextTile.index].becomePathEnd(prevTile)
+    this.tiles[prevTile.index].becomePathSegment(nextTile)
+    this.tileChain.push(nextTile)
+    console.log(this)
+
   }
+
+  
 }

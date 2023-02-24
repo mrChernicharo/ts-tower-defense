@@ -18,16 +18,22 @@ export type TileType =
   | "dirt"
   | "rock"
   | "lava"
-  | "grass-path-initial"
+  | "grass-path-end-B"
+  | "grass-path-end-L"
+  | "grass-path-end-R"
   | "grass-path-TB"
   | "grass-path-LR"
+  | "grass-path-RL"
   | "grass-path-TL"
   | "grass-path-TR"
   | "grass-path-LB"
   | "grass-path-RB"
-  | "dirt-path-initial"
+  | "dirt-path-end-B"
+  | "dirt-path-end-L"
+  | "dirt-path-end-R"
   | "dirt-path-TB"
   | "dirt-path-LR"
+  | "dirt-path-RL"
   | "dirt-path-TL"
   | "dirt-path-TR"
   | "dirt-path-LB"
@@ -38,16 +44,22 @@ enum TileAssets {
   dirt = "/assets/tiles/tile_dirt.webp",
   rock = "/assets/tiles/tile_rock.webp",
   lava = "/assets/tiles/tile_lava.webp",
-  "grass-path-initial" = "/assets/tiles/tile_grass_path_initial.webp",
+  "grass-path-end-B" = "/assets/tiles/tile_grass_path_end_B.webp",
+  "grass-path-end-L" = "/assets/tiles/tile_grass_path_end_L.webp",
+  "grass-path-end-R" = "/assets/tiles/tile_grass_path_end_R.webp",
   "grass-path-TB" = "/assets/tiles/tile_grass_path_TB.webp",
   "grass-path-LR" = "/assets/tiles/tile_grass_path_LR.webp",
+  "grass-path-RL" = "/assets/tiles/tile_grass_path_LR.webp",
   "grass-path-TL" = "/assets/tiles/tile_grass_path_TL.webp",
   "grass-path-TR" = "/assets/tiles/tile_grass_path_TR.webp",
   "grass-path-LB" = "/assets/tiles/tile_grass_path_LB.webp",
   "grass-path-RB" = "/assets/tiles/tile_grass_path_RB.webp",
-  "dirt-path-initial" = "/assets/tiles/tile_dirt_path_initial.webp",
+  "dirt-path-end-B" = "/assets/tiles/tile_dirt_path_end_B.webp",
+  "dirt-path-end-L" = "/assets/tiles/tile_dirt_path_end_L.webp",
+  "dirt-path-end-R" = "/assets/tiles/tile_dirt_path_end_R.webp",
   "dirt-path-TB" = "/assets/tiles/tile_dirt_path_TB.webp",
   "dirt-path-LR" = "/assets/tiles/tile_dirt_path_LR.webp",
+  "dirt-path-RL" = "/assets/tiles/tile_dirt_path_LR.webp",
   "dirt-path-TL" = "/assets/tiles/tile_dirt_path_TL.webp",
   "dirt-path-TR" = "/assets/tiles/tile_dirt_path_TR.webp",
   "dirt-path-LB" = "/assets/tiles/tile_dirt_path_LB.webp",
@@ -63,7 +75,7 @@ export class Tile {
   #defs: SVGDefsElement;
   #pattern: SVGPatternElement;
   #image: SVGImageElement;
-  connected = false;
+  #connected = false;
   hasTower = false;
   isBlocked = false;
   isStartingPoint = false;
@@ -214,6 +226,58 @@ export class Tile {
     return { left, center, right };
   }
 
+  becomePathSegment(nextTile: Tile) {
+    console.log("becomePathSegment"), { curr: this, nextTile };
+    this.#connected = true;
+
+    const vegetation = this.type.split('-')[0]
+    const rawPrevDir = this.type.split("-end-")[1] as "B" | "L" | "R";
+    const nextDir = nextTile.type.split("-end-")[1]  as "B" | "L" | "R";
+
+    if (!nextDir || !rawPrevDir || (vegetation !== "grass" && vegetation !== "dirt"))
+      throw Error("becomePathSegment needs to be called after becomePathEnd, we need info from the next path here");
+
+    const translatePrevDir = (rawPrevDir: "B" | "L" | "R") => {
+      switch (rawPrevDir) {
+        case "B":
+          return "T";
+        case "L":
+          return "R";
+        case "R":
+          return "L";
+      }
+    };
+
+    const prevDir = translatePrevDir(rawPrevDir);
+
+    console.log({ rawPrevDir, prevDir, nextDir });
+
+    this.#type = `${vegetation}-path-${prevDir}${nextDir}` as TileType;
+    this.#image.setAttribute("href", TileAssets[this.type]);
+  }
+
+  becomePathEnd(prevTile: Tile) {
+    console.log("becomePathEnd", { curr: this, prevTile });
+
+    const getDirection = (index: number) => {
+      if (index - this.index === 1) return "L";
+      if (index - this.index === -1) return "R";
+      else return "B";
+    };
+
+    if (this.type !== "grass" && this.type !== "dirt") {
+      throw Error("can't transform a non dirt/grass tile into a path");
+    }
+
+    // determine tile type (base + path + direction)
+    this.#type = `${this.type}-path-end-${getDirection(prevTile.index)}`;
+    this.exits = this.getTileExits(prevTile);
+    // change href
+    this.#image.setAttribute("href", TileAssets[this.type]);
+
+    // this.#type = ''
+  }
+
   get id() {
     return this.#id;
   }
@@ -228,5 +292,13 @@ export class Tile {
 
   get type() {
     return this.#type;
+  }
+
+  get connected() {
+    return this.#connected;
+  }
+
+  get shape() {
+    return this.#shape;
   }
 }
