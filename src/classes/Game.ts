@@ -32,7 +32,8 @@ export class Game {
   #wallTiles: any;
   #entrypoint: any;
   #firstWaveAtRow: number;
-  // waveNumber = null;
+  #waveLine: number;
+  #waveNumber = 0;
   // wavesTimes = [{ start: 0; end: null }];
   // gameSpeed = 2;
 
@@ -49,6 +50,7 @@ export class Game {
     this.#baseTile = baseTile;
     this.#entrypoint = entrypoint;
     this.#firstWaveAtRow = firstWaveAtRow;
+    this.#waveLine = this.#firstWaveAtRow;
 
     this.#wallTiles = wallTiles;
     this.#blockedTiles = blockedTiles;
@@ -105,7 +107,7 @@ export class Game {
 
         const tileType = (tileBlocked ? "lava" : isWall(row, col) ? "rock" : getTileType(isStartingPoint)) as TileType;
 
-        const newTile = new Tile(tileId, tileIdx, tilePos, tileType, isStartingPoint);
+        const newTile = new Tile(tileId, tileIdx, tilePos, tileType, this.#waveLine, isStartingPoint);
 
         tiles.push(newTile);
       }
@@ -172,21 +174,19 @@ export class Game {
     this.tileChain.push(nextTile);
 
     this.updateEnemyLanes();
+
+    const barrierBroken =
+      direction === "bottom" && nextTile.pos.y / TILE_WIDTH + 1 > this.#firstWaveAtRow + this.#waveNumber;
+
+    if (barrierBroken) {
+      this.updateTilesVisibility();
+      this.#waveLine++;
+    }
   }
 
   updateEnemyLanes() {
-    const chains = this.getTileChains();
-
-    enemy_lane_paths.left.setAttribute("d", drawPath(chains.left, "left"));
-    enemy_lane_paths.center.setAttribute("d", drawPath(chains.center, "center"));
-    enemy_lane_paths.right.setAttribute("d", drawPath(chains.right, "right"));
-  }
-
-  getTileChains() {
-    type Acc = { left: Pos[]; center: Pos[]; right: Pos[] };
-
-    return this.tileChain.reduce(
-      (acc: Acc, tile) => {
+    const chains = this.tileChain.reduce(
+      (acc: { left: Pos[]; center: Pos[]; right: Pos[] }, tile) => {
         acc.left.push(tile.exits!.left);
         acc.center.push(tile.exits!.center);
         acc.right.push(tile.exits!.right);
@@ -198,5 +198,20 @@ export class Game {
         right: [],
       }
     );
+
+    enemy_lane_paths.left.setAttribute("d", drawPath(chains.left, "left"));
+    enemy_lane_paths.center.setAttribute("d", drawPath(chains.center, "center"));
+    enemy_lane_paths.right.setAttribute("d", drawPath(chains.right, "right"));
+  }
+  updateTilesVisibility() {
+    const affectedTiles = this.tiles.filter(t => {
+      const tileRow = Number(t.id.split("-")[1]) / TILE_WIDTH;
+      return tileRow === this.#waveLine;
+    });
+
+    affectedTiles.forEach(t => {
+      console.log(t);
+      t.setVisibility(true);
+    });
   }
 }

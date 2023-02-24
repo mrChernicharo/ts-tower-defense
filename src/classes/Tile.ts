@@ -13,7 +13,7 @@ export interface TileExits {
   right: Pos;
 }
 
-export type EnemyLane = 'left' | 'center' | 'right'
+export type EnemyLane = "left" | "center" | "right";
 
 export type TileType =
   | "grass"
@@ -82,16 +82,26 @@ export class Tile {
   isBlocked = false;
   isStartingPoint = false;
   isEnemyEntrance = false;
-  isVisible = true;
+  #isVisible = true;
   exits: TileExits | null = null;
 
-  constructor(id: string, index: number, pos: Pos, type: TileType, isStartingPoint?: boolean, prevTile?: Tile) {
+  constructor(
+    id: string,
+    index: number,
+    pos: Pos,
+    type: TileType,
+    waveline: number,
+    isStartingPoint?: boolean,
+    prevTile?: Tile
+  ) {
     this.#id = id;
     this.#index = index;
     this.#pos = pos;
     this.#type = type;
+
     this.isBlocked = type === "lava";
     this.isStartingPoint = isStartingPoint || false;
+    this.#isVisible = this.pos.y / TILE_WIDTH < waveline;
 
     this.#shape = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     this.#defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
@@ -115,8 +125,9 @@ export class Tile {
     this.#shape.setAttribute("y", String(this.pos.y));
     this.#shape.setAttribute("height", TILE_WIDTH + "px");
     this.#shape.setAttribute("width", TILE_WIDTH + "px");
-    this.#shape.setAttribute("opacity", "1");
+    this.#shape.setAttribute("opacity", this.#isVisible ? "1" : "0.4");
     this.#shape.setAttribute("fill", `url(#${patternId})`);
+    // this.#shape.setAttribute("style", `filter: brightness:(${this.isVisible ? "1" : "1.5"});`);
 
     this.#defs.setAttribute("id", `defs-${this.id}`);
     this.#defs.setAttribute("class", "defs tile-defs");
@@ -142,14 +153,16 @@ export class Tile {
   }
 
   focus() {
-    this.#shape.setAttribute("opacity", "0.4");
-    this.#shape.setAttribute("style", `filter: drop-shadow(0 0 12px #88f);`);
+    this.#shape.setAttribute("opacity", "0.6");
+    // this.#shape.setAttribute("style", `filter: drop-shadow(0 0 12px #88f);`);
     const showRingMenu = new CustomEvent("show-ring-menu", { detail: this });
     document.dispatchEvent(showRingMenu);
   }
+
   blur() {
-    this.#shape.setAttribute("opacity", "1");
-    this.#shape.setAttribute("style", `filter: drop-shadow(0 0 0 #88f);`);
+    this.#shape.setAttribute("opacity", this.#isVisible ? "1" : "0.4");
+
+    // this.#shape.setAttribute("style", `filter: drop-shadow(0 0 0 #88f);`);
     const hideRingMenu = new CustomEvent("hide-ring-menu", { detail: null });
     document.dispatchEvent(hideRingMenu);
     // let waveLine = G.waveNumber + STAGES_AND_WAVES[G.stageNumber].stage.firstWaveAtRow;
@@ -172,7 +185,7 @@ export class Tile {
     if (this.hasTower) {
       return "towerDetail";
     }
-    if (!this.isBlocked && this.isVisible) {
+    if (!this.isBlocked && this.#isVisible) {
       return "newTower";
     }
     return null;
@@ -232,9 +245,9 @@ export class Tile {
     console.log("becomePathSegment"), { curr: this, nextTile };
     this.#connected = true;
 
-    const vegetation = this.type.split('-')[0]
+    const vegetation = this.type.split("-")[0];
     const rawPrevDir = this.type.split("-end-")[1] as "B" | "L" | "R";
-    const nextDir = nextTile.type.split("-end-")[1]  as "B" | "L" | "R";
+    const nextDir = nextTile.type.split("-end-")[1] as "B" | "L" | "R";
 
     if (!nextDir || !rawPrevDir || (vegetation !== "grass" && vegetation !== "dirt"))
       throw Error("becomePathSegment needs to be called after becomePathEnd, we need info from the next path here");
@@ -276,30 +289,28 @@ export class Tile {
     this.exits = this.getTileExits(prevTile);
     // change href
     this.#image.setAttribute("href", TileAssets[this.type]);
+  }
 
-    // this.#type = ''
+  setVisibility(value: boolean) {
+    this.#isVisible = value;
+    this.#shape.setAttribute("opacity", this.#isVisible ? "1" : "0.4");
   }
 
   get id() {
     return this.#id;
   }
-
   get pos() {
     return this.#pos;
   }
-
   get index() {
     return this.#index;
   }
-
   get type() {
     return this.#type;
   }
-
   get connected() {
     return this.#connected;
   }
-
   get shape() {
     return this.#shape;
   }

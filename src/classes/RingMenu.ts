@@ -136,24 +136,23 @@ export class RingMenu {
     buttons.forEach(button => {
       button.onclick = (e: MouseEvent) => {
         // console.log("clicked menu button", { button, tile, menuType: tile.getMenuType() });
-        switch(tile.getMenuType()) {
-          case 'newPath': 
-            this.#game.createNewPath(tile, button)
-          break;
-          case 'newTower': 
-          break;
-          case 'traps': 
-          break;
-          case 'towerDetail': 
-          break;
+        switch (tile.getMenuType()) {
+          case "newPath":
+            this.#game.createNewPath(tile, button);
+            break;
+          case "newTower":
+            break;
+          case "traps":
+            break;
+          case "towerDetail":
+            break;
         }
-
       };
     });
   }
 
   translate(pos: Pos) {
-    this.#path.setAttribute("style", `transform: translate(${pos.x - ringOffset}px, ${pos.y - ringOffset}px)`);
+    this.#path.setAttribute("style", `transform: translate(${pos.x - ringOffset}px, ${pos.y - ringOffset}px); pointer-events: none;`);
   }
   show() {
     this.#path.setAttribute("opacity", "0.5");
