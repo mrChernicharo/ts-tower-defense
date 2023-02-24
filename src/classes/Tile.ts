@@ -7,6 +7,12 @@ export interface Pos {
   y: number;
 }
 
+export interface TileExits {
+  left: Pos;
+  center: Pos;
+  right: Pos;
+}
+
 export type TileType =
   | "grass"
   | "dirt"
@@ -63,13 +69,15 @@ export class Tile {
   isStartingPoint = false;
   isEnemyEntrance = false;
   isVisible = true;
+  exits: TileExits | null = null;
 
-  constructor(id: string, index: number, pos: Pos, type: TileType) {
+  constructor(id: string, index: number, pos: Pos, type: TileType, isStartingPoint?: boolean, prevTile?: Tile) {
     this.#id = id;
     this.#index = index;
     this.#pos = pos;
     this.#type = type;
     this.isBlocked = type === "lava";
+    this.isStartingPoint = isStartingPoint || false;
 
     this.#shape = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     this.#defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
@@ -78,6 +86,9 @@ export class Tile {
 
     this.#drawTile();
     this.#attachEvents();
+    if (prevTile || isStartingPoint) {
+      this.exits = this.getTileExits(prevTile);
+    }
   }
 
   #drawTile() {
@@ -152,6 +163,56 @@ export class Tile {
     }
     return null;
   };
+
+  getTileExits(prevTile?: Tile) {
+    // console.log("getTileExits", { tile });
+
+    if (this.isStartingPoint || !prevTile) {
+      const left = { x: this.pos.x + TILE_WIDTH * 0.25, y: 0 };
+      const center = { x: this.pos.x + 50, y: 0 };
+      const right = { x: this.pos.x + 75, y: 0 };
+      // G.tileChain.push({ ...tile, exits });
+      return { left, center, right };
+    }
+
+    // const prevTile = G.tileChain.at(-1);
+
+    const left = { x: 0, y: 0 };
+    const center = { x: 0, y: 0 };
+    const right = { x: 0, y: 0 };
+
+    // newTile below
+    if (prevTile.pos.y < this.pos.y) {
+      left.x = this.pos.x + TILE_WIDTH * 0.25;
+      left.y = this.pos.y;
+      center.x = this.pos.x + TILE_WIDTH * 0.5;
+      center.y = this.pos.y;
+      right.x = this.pos.x + TILE_WIDTH * 0.75;
+      right.y = this.pos.y;
+    }
+
+    // newTile to the left
+    if (prevTile.pos.x > this.pos.x) {
+      left.x = this.pos.x + TILE_WIDTH;
+      left.y = this.pos.y + TILE_WIDTH * 0.25;
+      center.x = this.pos.x + TILE_WIDTH;
+      center.y = this.pos.y + TILE_WIDTH * 0.5;
+      right.x = this.pos.x + TILE_WIDTH;
+      right.y = this.pos.y + TILE_WIDTH * 0.75;
+    }
+
+    // newTile to the right
+    if (prevTile.pos.x < this.pos.x) {
+      left.x = this.pos.x;
+      left.y = this.pos.y + TILE_WIDTH * 0.75;
+      center.x = this.pos.x;
+      center.y = this.pos.y + TILE_WIDTH * 0.5;
+      right.x = this.pos.x;
+      right.y = this.pos.y + TILE_WIDTH * 0.25;
+    }
+    // console.log("getTileExits", { prevTile, left, center, right });
+    return { left, center, right };
+  }
 
   get id() {
     return this.#id;

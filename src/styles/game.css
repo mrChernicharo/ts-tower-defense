@@ -1,0 +1,15 @@
+#selection-ring-g {
+  animation: ring-grow;
+  animation-duration: 0.2s;
+  /* animation-timing-function: cubic-bezier(0.250, 0.460, 0.450, 0.940); */
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.ring-button {
+  transition: 0.2s;
+}
+.ring-button:hover {
+  cursor: pointer;
+  filter: brightness(0.65);
+}

@@ -16,7 +16,7 @@ export class Game {
   // bullets = [];
   tiles: Tile[];
   // bulletCount = 0;
-  // tileChain = [];
+  tileChain: Tile[];
   #selectedTile: Tile | null = null;
   #lastSelectedTile: Tile | null = null;
   // isPlaying = false;
@@ -56,6 +56,8 @@ export class Game {
     stage_name_span.textContent = `${this.#stageName}`;
 
     this.tiles = this.#createGrid();
+    this.tileChain = [this.tiles.find(t => t.isStartingPoint)!];
+    console.log(this)
     this.#appendEventListeners();
   }
 
@@ -102,7 +104,9 @@ export class Game {
 
         const tileType = (tileBlocked ? "lava" : isWall(row, col) ? "rock" : getTileType(isStartingPoint)) as TileType;
 
-        tiles.push(new Tile(tileId, tileIdx, tilePos, tileType));
+        const newTile = new Tile(tileId, tileIdx, tilePos, tileType, isStartingPoint);
+
+        tiles.push(newTile);
       }
     }
     return tiles;
@@ -154,5 +158,15 @@ export class Game {
         break;
     }
     return adj || null;
+  }
+
+  createNewPath(tile: Tile, button: SVGCircleElement) {
+    const direction = button.dataset.type!.split("-")[1] as IconDirection;
+    const adj = this.getAdjacentTile(tile, direction);
+
+    const prevTile = this.tileChain.at(-1);
+    const exits = tile.getTileExits(prevTile);
+
+    console.log({ direction, adj, prevTile, exits });
   }
 }

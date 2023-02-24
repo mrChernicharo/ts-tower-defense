@@ -50,17 +50,18 @@ export class RingMenu {
 
   #appendRingButtons(tile: Tile) {
     if (tile.getMenuType()) {
-      this.#drawRingIcons(tile);
+      const buttons = this.#drawRingButtons(tile);
+      this.#attachButtonsListeners(buttons, tile);
     }
   }
 
-  #drawRingIcons(tile: Tile) {
+  #drawRingButtons(tile: Tile) {
     const menuType = tile.getMenuType()!;
 
-    const icons = [];
-    for (const [i, menuIcon] of RING_MENU_ICONS[menuType].entries()) {
+    const buttons = [];
+    for (const [i, menuButton] of RING_MENU_ICONS[menuType].entries()) {
       if (menuType === "newPath") {
-        const iconDirection = menuIcon.type.split("-")[1] as IconDirection;
+        const iconDirection = menuButton.type.split("-")[1] as IconDirection;
         const adjacentTile = this.#game.getAdjacentTile(tile, iconDirection);
         const isBuildableAdj =
           !tile.connected && adjacentTile && !adjacentTile.isBlocked && adjacentTile.canBecomePath();
@@ -73,32 +74,32 @@ export class RingMenu {
       const pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern");
       const image = document.createElementNS("http://www.w3.org/2000/svg", "image");
 
-      const patternId = `pattern-${menuIcon.id}`;
-      const ringColor = menuIcon.color;
+      const patternId = `pattern-${menuButton.id}`;
+      const ringColor = menuButton.color;
       // if (menuType === "newTower" && !canAfford(TOWERS[menuIcon.type].price)) {
       //   ringColor = "#999";
       // }
 
       circle.setAttribute("class", `ring-button`);
       circle.setAttribute("data-entity", `ring-button`);
-      circle.setAttribute("data-type", menuIcon.type);
-      circle.setAttribute("id", menuIcon.id);
-      circle.setAttribute("cx", String(tile.pos.x + menuIcon.x - ringOffset));
-      circle.setAttribute("cy", String(tile.pos.y + menuIcon.y - ringOffset));
+      circle.setAttribute("data-type", menuButton.type);
+      circle.setAttribute("id", menuButton.id);
+      circle.setAttribute("cx", String(tile.pos.x + menuButton.x - ringOffset));
+      circle.setAttribute("cy", String(tile.pos.y + menuButton.y - ringOffset));
       circle.setAttribute("r", "20");
       circle.setAttribute("stroke", ringColor);
       circle.setAttribute("stroke-width", "2");
       circle.setAttribute("fill", `url(#${patternId})`);
 
-      defs.setAttribute("id", `defs-${menuIcon.id}`);
+      defs.setAttribute("id", `defs-${menuButton.id}`);
       defs.setAttribute("class", "defs");
 
       pattern.setAttribute("id", patternId);
       pattern.setAttribute("width", "28");
       pattern.setAttribute("height", "28");
 
-      image.setAttribute("href", menuIcon.img);
-      image.setAttribute("id", `image-${menuIcon.id}`);
+      image.setAttribute("href", menuButton.img);
+      image.setAttribute("id", `image-${menuButton.id}`);
       image.setAttribute("x", "6");
       image.setAttribute("y", "6");
       image.setAttribute("width", "28");
@@ -113,9 +114,9 @@ export class RingMenu {
       ring_menu_g.append(defs);
       ring_menu_g.append(circle);
 
-      icons.push(circle);
+      buttons.push(circle);
     }
-    return icons;
+    return buttons;
   }
 
   #removeRingButtons() {
@@ -128,6 +129,26 @@ export class RingMenu {
       if (!defs.classList.contains("tower-defs")) {
         defs.remove();
       }
+    });
+  }
+
+  #attachButtonsListeners(buttons: SVGCircleElement[], tile: Tile) {
+    buttons.forEach(button => {
+      button.onclick = (e: MouseEvent) => {
+        // console.log("clicked menu button", { button, tile, menuType: tile.getMenuType() });
+        switch(tile.getMenuType()) {
+          case 'newPath': 
+            this.#game.createNewPath(tile, button)
+          break;
+          case 'newTower': 
+          break;
+          case 'traps': 
+          break;
+          case 'towerDetail': 
+          break;
+        }
+
+      };
     });
   }
 
