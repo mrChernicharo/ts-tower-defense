@@ -1,5 +1,6 @@
 import { STAGES_AND_WAVES, TILE_WIDTH } from "../lib/constants";
 import { scene, stage_name_span, stage_number_span, svg } from "../lib/DOM_elements";
+import { IconDirection } from "./RingMenu";
 import { Tile, TileType } from "./Tile";
 
 type StageInfo = typeof STAGES_AND_WAVES[keyof typeof STAGES_AND_WAVES];
@@ -13,7 +14,7 @@ export class Game {
   // enemies = [];
   // towers = [];
   // bullets = [];
-  #tiles: Tile[];
+  tiles: Tile[];
   // bulletCount = 0;
   // tileChain = [];
   #selectedTile: Tile | null = null;
@@ -54,8 +55,15 @@ export class Game {
     stage_number_span.textContent = `Stage ${this.#stageNumber}`;
     stage_name_span.textContent = `${this.#stageName}`;
 
-    this.#tiles = this.#createGrid();
+    this.tiles = this.#createGrid();
     this.#appendEventListeners();
+  }
+
+  get cols() {
+    return this.#cols;
+  }
+  get rows() {
+    return this.#rows;
   }
 
   #createGrid() {
@@ -130,5 +138,21 @@ export class Game {
       this.#lastSelectedTile?.blur();
       this.#selectedTile.focus();
     });
+  }
+
+  getAdjacentTile(tile: Tile, direction: IconDirection): Tile | null {
+    let adj;
+    switch (direction) {
+      case "left":
+        adj = this.tiles?.find(t => t.index === tile.index - 1 && tile.pos.x > 0);
+        break;
+      case "right":
+        adj = this.tiles?.find(t => t.index === tile.index + 1 && tile.pos.x / TILE_WIDTH < this.cols - 1);
+        break;
+      case "bottom":
+        adj = this.tiles?.find(t => t.index === tile.index + this.cols);
+        break;
+    }
+    return adj || null;
   }
 }

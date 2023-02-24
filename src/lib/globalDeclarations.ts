@@ -3,7 +3,7 @@ import { Tile } from "../classes/Tile";
 interface CustomEventMap {
   "tile-clicked": CustomEvent<Tile>;
   "show-ring-menu": CustomEvent<Tile>;
-  "hide-ring-menu": CustomEvent<Tile>;
+  "hide-ring-menu": CustomEvent<null>;
   
 }
 //adds definition to Document

@@ -11,6 +11,6 @@ const stageNumber = getStageNumberFromUrl() as StageKeys;
 const stageInfo = STAGES_AND_WAVES[stageNumber];
 
 const game = new Game(stageInfo);
-const ringMenu = new RingMenu();
+const ringMenu = new RingMenu(game);
 
 console.log(player, game);

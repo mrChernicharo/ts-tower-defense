@@ -4,6 +4,8 @@ export const tiles_g = document.querySelector('g#tiles-g')!;
 export const towers_g = document.querySelector('g#towers-g')!;
 export const bullets_g = document.querySelector('g#bullets-g')!;
 export const enemies_g = document.querySelector('g#enemies-g')!;
+export const ring_menu_g = document.querySelector('g#ring-menu-g')!;
+
 
 export const player_id_div = document.querySelector("#player-id-div") as HTMLDivElement;
 export const player_level_div = document.querySelector("#player-level-div") as HTMLDivElement;

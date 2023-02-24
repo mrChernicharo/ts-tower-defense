@@ -1,5 +1,6 @@
 import { TILE_WIDTH } from "../lib/constants";
-import { scene, tiles_g } from "../lib/DOM_elements";
+import { tiles_g } from "../lib/DOM_elements";
+import { RingMenuType } from "./RingMenu";
 
 export interface Pos {
   x: number;
@@ -61,13 +62,14 @@ export class Tile {
   isBlocked = false;
   isStartingPoint = false;
   isEnemyEntrance = false;
-  isVisible = false;
+  isVisible = true;
 
   constructor(id: string, index: number, pos: Pos, type: TileType) {
     this.#id = id;
     this.#index = index;
     this.#pos = pos;
     this.#type = type;
+    this.isBlocked = type === "lava";
 
     this.#shape = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     this.#defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
@@ -79,19 +81,19 @@ export class Tile {
   }
 
   #drawTile() {
-    const patternId = `_tile-pattern-${this.#id}`;
+    const patternId = `_tile-pattern-${this.id}`;
 
-    this.#shape.setAttribute("id", this.#id);
+    this.#shape.setAttribute("id", this.id);
     this.#shape.setAttribute("data-entity", "tile");
-    this.#shape.setAttribute("data-index", String(this.#index));
-    this.#shape.setAttribute("x", String(this.#pos.x));
-    this.#shape.setAttribute("y", String(this.#pos.y));
+    this.#shape.setAttribute("data-index", String(this.index));
+    this.#shape.setAttribute("x", String(this.pos.x));
+    this.#shape.setAttribute("y", String(this.pos.y));
     this.#shape.setAttribute("height", TILE_WIDTH + "px");
     this.#shape.setAttribute("width", TILE_WIDTH + "px");
     this.#shape.setAttribute("opacity", "1");
     this.#shape.setAttribute("fill", `url(#${patternId})`);
 
-    this.#defs.setAttribute("id", `defs-${this.#id}`);
+    this.#defs.setAttribute("id", `defs-${this.id}`);
     this.#defs.setAttribute("class", "defs tile-defs");
     this.#pattern.setAttribute("id", patternId);
     this.#pattern.setAttribute("width", "1");
@@ -123,14 +125,33 @@ export class Tile {
   blur() {
     this.#shape.setAttribute("opacity", "1");
     this.#shape.setAttribute("style", `filter: drop-shadow(0 0 0 #88f);`);
-    const hideRingMenu = new CustomEvent("hide-ring-menu", { detail: this });
+    const hideRingMenu = new CustomEvent("hide-ring-menu", { detail: null });
     document.dispatchEvent(hideRingMenu);
     // let waveLine = G.waveNumber + STAGES_AND_WAVES[G.stageNumber].stage.firstWaveAtRow;
     // const afterWaveLineAndInvisible = row >= waveLine && !this.visible && !this.enemyEntrance;
-
     // this.shape.setAttribute("opacity", afterWaveLineAndInvisible ? 0.4 : 1);
     // this.shape.setAttribute("style", `filter: drop-shadow(0 0 0 #88f);`);
   }
+
+  canBecomePath() {
+    return (this.type === "grass" || this.type === "dirt") && !this.hasTower;
+  }
+
+  getMenuType = (): RingMenuType | null => {
+    if (this.type.includes("path") && this.connected) {
+      return "traps";
+    }
+    if (this.type.includes("path") && !this.connected) {
+      return "newPath";
+    }
+    if (this.hasTower) {
+      return "towerDetail";
+    }
+    if (!this.isBlocked && this.isVisible) {
+      return "newTower";
+    }
+    return null;
+  };
 
   get id() {
     return this.#id;

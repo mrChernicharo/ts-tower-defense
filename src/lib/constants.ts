@@ -12,37 +12,37 @@ export const initialCastleHP = 10;
 export const TILE_WIDTH = 100;
 export const MARGIN = TILE_WIDTH / 2;
 
-export const menuIcons = {
-  trap: [
+export const RING_MENU_ICONS = {
+  traps: [
     {
       id: "mine-trap-icon",
       type: "mine",
-      x: 20,
-      y: 25,
+      x: TILE_WIDTH * 0.2, // 20
+      y: TILE_WIDTH * 0.25, // 25
       color: "orangered",
       img: "/assets/icons/bullseye.svg",
     },
     {
       id: "slime-trap-icon",
       type: "slime",
-      x: 20,
-      y: 125,
+      x: TILE_WIDTH * 0.2, // 20
+      y: TILE_WIDTH * 1.25, // 125
       color: "#22b165",
       img: "/assets/icons/bottle-droplet.svg",
     },
     {
       id: "poison-trap-icon",
       type: "poison",
-      x: 130,
-      y: 25,
+      x: TILE_WIDTH * 1.3, // 130,
+      y: TILE_WIDTH * 0.25, // 25,
       color: "lightgreen",
       img: "/assets/icons/flask.svg",
     },
     {
       id: "ice-trap-icon",
       type: "ice",
-      x: 130,
-      y: 125,
+      x: TILE_WIDTH * 1.3, // 130,
+      y: TILE_WIDTH * 1.25, // 125,
       color: "lightblue",
       img: "/assets/icons/icicles.svg",
     },
@@ -51,8 +51,8 @@ export const menuIcons = {
     {
       id: "shovel-right-icon",
       type: "shovel-right",
-      x: 150,
-      y: 75,
+      x: TILE_WIDTH * 1.5, // 150,
+      y: TILE_WIDTH * 0.75, // 75,
       color: "red",
       img: "/assets/icons/shovel.svg",
     },
@@ -60,24 +60,24 @@ export const menuIcons = {
       id: "shovel-left-icon",
       type: "shovel-left",
       x: 0,
-      y: 75,
+      y: TILE_WIDTH * 0.75, // 75,
       color: "red",
       img: "/assets/icons/shovel.svg",
     },
     {
       id: "shovel-bottom-icon",
       type: "shovel-bottom",
-      x: 75,
-      y: 150,
+      x: TILE_WIDTH * 0.75, // 75,
+      y: TILE_WIDTH * 1.5, // 150,
       color: "red",
       img: "/assets/icons/shovel.svg",
     },
   ],
-  tower: [
+  towerDetail: [
     {
       id: "upgrade-icon",
       type: "upgrade",
-      x: 75,
+      x: TILE_WIDTH * 0.75, // 75,
       y: 0,
       color: "#7dfd90",
       img: "/assets/icons/upgrade.svg",
@@ -85,16 +85,16 @@ export const menuIcons = {
     {
       id: "sell-icon",
       type: "sell",
-      x: 10, // 310
-      y: 115, // 213
+      x: TILE_WIDTH * 0.1, // 10, 
+      y: TILE_WIDTH * 1.15, // 115,
       color: "gold",
       img: "/assets/icons/sack-dollar.svg",
     },
     {
       id: "info-icon",
       type: "info",
-      x: 140, // 440 - 30
-      y: 115, // 215 - 225
+      x: TILE_WIDTH * 1.4, // 140,
+      y: TILE_WIDTH * 1.15, // 115, 
       color: "#ddd",
       img: "/assets/icons/book.svg",
     },
@@ -103,7 +103,7 @@ export const menuIcons = {
     {
       id: "fire-tower-add-icon",
       type: "fire",
-      x: 75,
+      x: TILE_WIDTH * 0.75, // 75,
       y: 0,
       color: "red",
       img: "/assets/icons/fire.svg",
@@ -111,8 +111,8 @@ export const menuIcons = {
     {
       id: "lightning-tower-add-icon",
       type: "lightning",
-      x: 150,
-      y: 75,
+      x: TILE_WIDTH * 1.5, // 150,
+      y: TILE_WIDTH * 0.75, // 75,
       color: "gold",
       img: "/assets/icons/bolt.svg",
     },
@@ -120,15 +120,15 @@ export const menuIcons = {
       id: "ice-tower-add-icon",
       type: "ice",
       x: 0,
-      y: 75,
+      y: TILE_WIDTH * 0.75, // 75,
       color: "dodgerblue",
       img: "/assets/icons/snowflake.svg",
     },
     {
       id: "earth-tower-add-icon",
       type: "earth",
-      x: 75,
-      y: 150,
+      x: TILE_WIDTH * 0.75, // 75,
+      y: TILE_WIDTH * 1.5, // 150,
       color: "orange",
       img: "/assets/icons/mountain.svg",
     },
