@@ -71,7 +71,7 @@ enum TileAssets {
 export class Tile {
   #id: string;
   #index: number;
-  pos: Pos;
+  #pos: Pos;
   #type: TileType;
   #shape: SVGRectElement;
   #defs: SVGDefsElement;
@@ -96,7 +96,7 @@ export class Tile {
   ) {
     this.#id = id;
     this.#index = index;
-    this.pos = pos;
+    this.#pos = pos;
     this.#type = type;
 
     this.isBlocked = type === "lava";
@@ -116,15 +116,32 @@ export class Tile {
   }
 
   
-
+  get id() {
+    return this.#id;
+  }
+  get index() {
+    return this.#index;
+  }
+  get type() {
+    return this.#type;
+  }
+  get connected() {
+    return this.#connected;
+  }
+  get shape() {
+    return this.#shape;
+  }
+  get pos() {
+    return this.#pos;
+  }
   #drawTile() {
     const patternId = `_tile-pattern-${this.id}`;
 
     this.#shape.setAttribute("id", this.id);
     this.#shape.setAttribute("data-entity", "tile");
     this.#shape.setAttribute("data-index", String(this.index));
-    this.#shape.setAttribute("x", String(this.pos.x));
-    this.#shape.setAttribute("y", String(this.pos.y));
+    this.#shape.setAttribute("x", String(this.#pos.x));
+    this.#shape.setAttribute("y", String(this.#pos.y));
     this.#shape.setAttribute("height", TILE_WIDTH + "px");
     this.#shape.setAttribute("width", TILE_WIDTH + "px");
     this.#shape.setAttribute("opacity", this.#isVisible ? "1" : "0.4");
@@ -197,9 +214,9 @@ export class Tile {
     // console.log("getTileExits", { tile });
 
     if (this.isStartingPoint || !prevTile) {
-      const left = { x: this.pos.x + TILE_WIDTH * 0.25, y: 0 };
-      const center = { x: this.pos.x + TILE_WIDTH * 0.5, y: 0 };
-      const right = { x: this.pos.x + TILE_WIDTH * 0.75, y: 0 };
+      const left = { x: this.#pos.x + TILE_WIDTH * 0.25, y: 0 };
+      const center = { x: this.#pos.x + TILE_WIDTH * 0.5, y: 0 };
+      const right = { x: this.#pos.x + TILE_WIDTH * 0.75, y: 0 };
       // G.tileChain.push({ ...tile, exits });
       return { left, center, right };
     }
@@ -211,33 +228,33 @@ export class Tile {
     const right = { x: 0, y: 0 };
 
     // newTile below
-    if (prevTile.pos.y < this.pos.y) {
-      left.x = this.pos.x + TILE_WIDTH * 0.25;
-      left.y = this.pos.y;
-      center.x = this.pos.x + TILE_WIDTH * 0.5;
-      center.y = this.pos.y;
-      right.x = this.pos.x + TILE_WIDTH * 0.75;
-      right.y = this.pos.y;
+    if (prevTile.pos.y < this.#pos.y) {
+      left.x = this.#pos.x + TILE_WIDTH * 0.25;
+      left.y = this.#pos.y;
+      center.x = this.#pos.x + TILE_WIDTH * 0.5;
+      center.y = this.#pos.y;
+      right.x = this.#pos.x + TILE_WIDTH * 0.75;
+      right.y = this.#pos.y;
     }
 
     // newTile to the left
-    if (prevTile.pos.x > this.pos.x) {
-      left.x = this.pos.x + TILE_WIDTH;
-      left.y = this.pos.y + TILE_WIDTH * 0.25;
-      center.x = this.pos.x + TILE_WIDTH;
-      center.y = this.pos.y + TILE_WIDTH * 0.5;
-      right.x = this.pos.x + TILE_WIDTH;
-      right.y = this.pos.y + TILE_WIDTH * 0.75;
+    if (prevTile.pos.x > this.#pos.x) {
+      left.x = this.#pos.x + TILE_WIDTH;
+      left.y = this.#pos.y + TILE_WIDTH * 0.25;
+      center.x = this.#pos.x + TILE_WIDTH;
+      center.y = this.#pos.y + TILE_WIDTH * 0.5;
+      right.x = this.#pos.x + TILE_WIDTH;
+      right.y = this.#pos.y + TILE_WIDTH * 0.75;
     }
 
     // newTile to the right
-    if (prevTile.pos.x < this.pos.x) {
-      left.x = this.pos.x;
-      left.y = this.pos.y + TILE_WIDTH * 0.75;
-      center.x = this.pos.x;
-      center.y = this.pos.y + TILE_WIDTH * 0.5;
-      right.x = this.pos.x;
-      right.y = this.pos.y + TILE_WIDTH * 0.25;
+    if (prevTile.pos.x < this.#pos.x) {
+      left.x = this.#pos.x;
+      left.y = this.#pos.y + TILE_WIDTH * 0.75;
+      center.x = this.#pos.x;
+      center.y = this.#pos.y + TILE_WIDTH * 0.5;
+      right.x = this.#pos.x;
+      right.y = this.#pos.y + TILE_WIDTH * 0.25;
     }
     // console.log("getTileExits", { prevTile, left, center, right });
     return { left, center, right };
@@ -298,19 +315,5 @@ export class Tile {
     this.#shape.setAttribute("opacity", this.#isVisible ? "1" : "0.4");
   }
 
-  get id() {
-    return this.#id;
-  }
-  get index() {
-    return this.#index;
-  }
-  get type() {
-    return this.#type;
-  }
-  get connected() {
-    return this.#connected;
-  }
-  get shape() {
-    return this.#shape;
-  }
+
 }

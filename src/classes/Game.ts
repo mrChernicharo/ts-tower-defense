@@ -86,9 +86,10 @@ export class Game {
   }
   get selectedTile() {
     return this.#selectedTile;
+    // return Object.assign({}, this.#selectedTile);
   }
   get waveNumber() {
-    return this.#waveNumber;
+    return this.#waveNumber.valueOf();
   }
 
   #createGrid() {
@@ -183,6 +184,7 @@ export class Game {
     play_pause_btn.onclick = (e: MouseEvent) => {
       if (this.#clock.isPlaying) {
         this.#clock.pause();
+        this.waveTimes[this.#waveNumber].end = this.#clock.time;
         return;
       }
 
@@ -289,44 +291,44 @@ export class Game {
   }
 
   #onWaveStart() {
-    console.log("onWaveStart");
     this.updateTilesVisibility();
     this.#waveLine++;
-    this.#inBattle = true;
     this.#clock.play();
     play_pause_btn.removeAttribute("disabled");
 
-    this.waveTimes.push({ start: this.#clock.time, end: null });
+    this.waveTimes = [...this.waveTimes, { start: this.#clock.time, end: null }];
+    console.log("onWaveStart", this.#waveNumber, this.waveTimes);
 
     const lastTile = this.tileChain.at(-1)!;
     this.currentWave = this.#waves[this.#waveNumber].wave.map(
       enemy => new Enemy(lastTile.pos, enemy.type, enemy.lane, enemy.delay)
     );
+    this.#inBattle = true;
   }
 
   #onWaveEnd() {
-    if (!this.#inBattle) return;
     this.#inBattle = false;
-    this.#clock.pause();
     console.log("onWaveEnd", this.#waveNumber, this.waveTimes);
     this.waveTimes[this.#waveNumber].end = this.#clock.time;
 
     play_pause_btn.setAttribute("disabled", "ok");
     const onWaveEndEvent = new CustomEvent("on-wave-end", { detail: null });
     document.dispatchEvent(onWaveEndEvent);
-    
+
     const lastTile = this.tileChain.at(-1)!;
     lastTile.isEnemyEntrance = false;
     this.#waveNumber++;
   }
 
   #loopStep(frame: number, time: number, counter: number) {
-    if (this.currentWave.every(enemy => enemy.done)) {
+    if (!this.waveTimes[this.#waveNumber]) return;
+    if (this.#inBattle && this.currentWave.every(enemy => enemy.done)) {
+      this.#clock.pause();
       return this.#onWaveEnd();
     }
-    // console.log(this.currentWave, frame);
+    console.log({ time, by60: time / 60, waveTimeStart: this.waveTimes[this.#waveNumber]?.start });
     this.currentWave
-      .filter(enemy => !enemy.spawned && time / 60 - this.waveTimes[this.waveNumber].start > enemy.delay)
+      .filter(enemy => !enemy.spawned && time / 60 - this.waveTimes[this.#waveNumber].start > enemy.delay)
       .forEach(enemy => {
         this.enemies.push(enemy);
         enemy.spawn();

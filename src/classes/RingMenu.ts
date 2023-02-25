@@ -23,7 +23,7 @@ export class RingMenu {
     document.addEventListener("show-ring-menu", (e: CustomEvent<Tile>) => {
       console.log("show-ring-menu", e.detail, e.detail.pos.x, e.detail.pos.y);
       if (e.detail.isBlocked) return;
-      this.translate({ ...e.detail.pos });
+      this.translate({ x: e.detail.pos.x, y: e.detail.pos.y });
       this.#appendRingButtons(e.detail);
       this.show();
     });

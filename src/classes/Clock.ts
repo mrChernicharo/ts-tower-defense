@@ -11,11 +11,11 @@ export class Clock {
     this.callback = callback;
   }
   get speed() {
-    return this.#speed;
+    return this.#speed.valueOf();
   }
 
   get time() {
-    return this.#time;
+    return this.#time.valueOf();
   }
 
   play() {
