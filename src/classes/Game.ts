@@ -239,21 +239,21 @@ export class Game {
     this.tiles[prevTile.index].turnIntoPathSegment(nextTile);
     this.tileChain.push(nextTile);
 
-    this.updateEnemyLanes();
-
     const barrierBroken =
       direction === "bottom" && nextTile.pos.y / TILE_WIDTH + 1 > this.#firstWaveAtRow + this.#waveNumber;
+
+    this.updateEnemyLanes(barrierBroken);
 
     if (barrierBroken) {
       this.#onWaveStart();
 
-      // setTimeout(() => {
-      //   this.#onWaveEnd();
-      // }, 3000);
+      setTimeout(() => {
+        this.#onWaveEnd();
+      }, 10000);
     }
   }
 
-  updateEnemyLanes() {
+  updateEnemyLanes(hasEnemyEntrance: boolean) {
     const chains = this.tileChain.reduce(
       (acc: { left: Pos[]; center: Pos[]; right: Pos[] }, tile) => {
         acc.left.push(tile.exits!.left);
@@ -268,10 +268,19 @@ export class Game {
       }
     );
 
-    enemy_lane_paths.left.setAttribute("d", drawPath(chains.left, "left"));
-    enemy_lane_paths.center.setAttribute("d", drawPath(chains.center, "center"));
-    enemy_lane_paths.right.setAttribute("d", drawPath(chains.right, "right"));
+    const lastTile = this.tileChain.at(-1)!;
+
+    enemy_lane_paths.left.setAttribute("d", drawPath(chains.left, "left", hasEnemyEntrance));
+    enemy_lane_paths.center.setAttribute("d", drawPath(chains.center, "center", hasEnemyEntrance));
+    enemy_lane_paths.right.setAttribute("d", drawPath(chains.right, "right", hasEnemyEntrance));
+
+    if (hasEnemyEntrance) {
+      lastTile.isEnemyEntrance = true;
+      console.log(this.tiles, this.tileChain, lastTile.index);
+    }
   }
+
+  drawPathEntrance() {}
 
   updateTilesVisibility() {
     const affectedTiles = this.tiles.filter(t => {
@@ -294,8 +303,6 @@ export class Game {
     this.waveTimes.push({ start: this.#clock.time, end: null });
 
     const lastTile = this.tileChain.at(-1)!;
-    lastTile.isEnemyEntrance = true;
-
     this.currentWave = this.#waves[this.#waveNumber].wave.map(
       enemy => new Enemy(lastTile.pos, enemy.type, enemy.lane, enemy.delay)
     );
@@ -316,7 +323,7 @@ export class Game {
   }
 
   #loopStep(frame: number, time: number, counter: number) {
-    // console.log()
+    // console.log(this.currentWave, frame);
     this.currentWave
       .filter(enemy => !enemy.spawned && time / 60 - this.waveTimes[this.waveNumber].start > enemy.delay)
       .forEach(enemy => {

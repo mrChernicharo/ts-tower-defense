@@ -1,4 +1,4 @@
-import { EnemyLane, Pos } from "../classes/Tile";
+import { EnemyLane, Pos, Tile } from "../classes/Tile";
 import { TILE_WIDTH } from "./constants";
 
 export function generateUUID(digits: number) {
@@ -21,7 +21,7 @@ export function getStageNumberFromUrl() {
   return 1;
 }
 
-export function drawPath(points: Pos[], lane: EnemyLane) {
+export function drawPath(points: Pos[], lane: EnemyLane, hasEnemyEntrance: boolean) {
   let d = "";
   let prevPos: Pos | null = null;
 
@@ -53,8 +53,44 @@ export function drawPath(points: Pos[], lane: EnemyLane) {
     }
     prevPos = pos;
   }
+
+  if (hasEnemyEntrance) {
+    let entryPos = { x: 0, y: 0 };
+    const firstTileEntry = points.at(-1)!;
+
+    entryPos.x = firstTileEntry.x;
+    entryPos.y = firstTileEntry.y + TILE_WIDTH * 0.5;
+
+    if (lane === "left") {
+      entryPos.x += TILE_WIDTH * 0.25;
+    }
+    if (lane === "right") {
+      entryPos.x -= TILE_WIDTH * 0.25;
+    }
+
+    d += ` L ${entryPos.x} ${entryPos.y}`;
+  }
   return d;
 }
+
+// export function drawPathEntrance(tile: Tile, points: Pos[], lane: EnemyLane) {
+//   if (!tile.isEnemyEntrance) return
+
+//     let entryPos = { x: 0, y: 0 };
+//     const firstTileEntry = points.at(-1)!;
+
+//     entryPos.x = firstTileEntry.x;
+//     entryPos.y = firstTileEntry.y + TILE_WIDTH * 0.5;
+
+//     if (lane === "left") {
+//       entryPos.x += TILE_WIDTH * 0.25;
+//     }
+//     if (lane === "right") {
+//       entryPos.x -= TILE_WIDTH * 0.25;
+//     }
+
+//     d += ` L ${entryPos.x} ${entryPos.y}`;
+// }
 
 // const hasEnemyEntrance = G.tileChain.at(-1)?.enemyEntrance;
 // if (hasEnemyEntrance) {
