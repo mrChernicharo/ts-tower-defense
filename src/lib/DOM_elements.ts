@@ -1,11 +1,10 @@
-export const svg = document.querySelector('svg')!;
-export const scene = document.querySelector('g#scene')!;
-export const tiles_g = document.querySelector('g#tiles-g')!;
-export const towers_g = document.querySelector('g#towers-g')!;
-export const bullets_g = document.querySelector('g#bullets-g')!;
-export const enemies_g = document.querySelector('g#enemies-g')!;
-export const ring_menu_g = document.querySelector('g#ring-menu-g')!;
-
+export const svg = document.querySelector("svg")!;
+export const scene = document.querySelector("g#scene")!;
+export const tiles_g = document.querySelector("g#tiles-g")!;
+export const towers_g = document.querySelector("g#towers-g")!;
+export const bullets_g = document.querySelector("g#bullets-g")!;
+export const enemies_g = document.querySelector("g#enemies-g")!;
+export const ring_menu_g = document.querySelector("g#ring-menu-g")!;
 
 export const player_id_div = document.querySelector("#player-id-div") as HTMLDivElement;
 export const player_level_div = document.querySelector("#player-level-div") as HTMLDivElement;
@@ -21,10 +20,10 @@ export const spend5StarsBtn = document.querySelector("#spend-stars-btn") as HTML
 export const stages_list_ul = document.querySelector("#stages-list-ul") as HTMLUListElement;
 
 export const enemy_lane_paths = {
-  left: document.querySelector("#enemy-lane-left")!,
-  center: document.querySelector("#enemy-lane-center")!,
-  right: document.querySelector("#enemy-lane-right")!,
+  left: document.querySelector("#enemy-lane-left") as SVGPathElement,
+  center: document.querySelector("#enemy-lane-center") as SVGPathElement,
+  right: document.querySelector("#enemy-lane-right") as SVGPathElement,
 };
 
 export const game_speed_form = document.querySelector("#game-speed-form") as HTMLFormElement;
-export const play_pause_btn = document.querySelector('#play-pause-btn') as HTMLButtonElement
+export const play_pause_btn = document.querySelector("#play-pause-btn") as HTMLButtonElement;

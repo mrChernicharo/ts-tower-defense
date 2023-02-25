@@ -47,7 +47,7 @@ export class Game {
   // wavesTimes = [{ start: 0; end: null }];
   // gameSpeed = 2;
 
-  constructor(stageInfo: StageInfo, clock: Clock) {
+  constructor(stageInfo: StageInfo) {
     console.log({ stageInfo });
     const { stage, blockedTiles, wallTiles, waves } = stageInfo;
     const { name, number, cols, rows, baseTile, entrypoint, firstWaveAtRow } = stage;
@@ -72,8 +72,7 @@ export class Game {
     this.tileChain = [this.tiles.find(t => t.isStartingPoint)!];
     this.#appendEventListeners();
 
-    this.#clock = clock;
-    console.log(this);
+    this.#clock = new Clock(this.#loopStep.bind(this));
   }
 
   get cols() {
@@ -186,6 +185,29 @@ export class Game {
       this.#clock.play();
       return;
     };
+
+    document.addEventListener("ring-menu-button-click", event => {
+      const { menuType } = event.detail;
+      // const { e, menuType } = event.detail;
+      // const target = e.target;
+      // console.log("ring-menu-button-click", { e, menuType, event, target });
+
+      switch (menuType) {
+        case "newPath":
+          document.dispatchEvent(new CustomEvent("hide-ring-menu", { detail: null }));
+          this.selectedTile?.blur();
+          break;
+        case "newTower":
+          //
+          break;
+        case "traps":
+          //
+          break;
+        case "towerDetail":
+          //
+          break;
+      }
+    });
   }
 
   getAdjacentTile(tile: Tile, direction: IconDirection): Tile | null {
@@ -272,6 +294,10 @@ export class Game {
     this.#clock.pause();
     play_pause_btn.setAttribute("disabled", "ok");
     const onWaveEnd = new CustomEvent("on-wave-end", { detail: null });
-    document.dispatchEvent(onWaveEnd)
+    document.dispatchEvent(onWaveEnd);
+  }
+
+  #loopStep(frame: number, counter: number) {
+    console.log("loop update", this, frame, counter);
   }
 }

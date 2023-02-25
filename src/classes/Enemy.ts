@@ -1,14 +1,14 @@
 import { ENEMIES } from "../lib/constants";
-import { enemies_g } from "../lib/DOM_elements";
+import { enemies_g, enemy_lane_paths } from "../lib/DOM_elements";
 import { generateUUID } from "../lib/helpers";
 import { EnemyLane, Pos } from "./Tile";
 
 export type EnemyType = "goblin" | "orc" | "troll" | "dragon";
-
+let count = 0;
 export class Enemy {
   #type: EnemyType;
   #id: string;
-  #lane: EnemyLane;
+  #lane: SVGPathElement;
   #shape: SVGPolygonElement;
   #gold: number;
   #text: SVGTextElement;
@@ -26,7 +26,7 @@ export class Enemy {
 
     this.#id = `${type}-${generateUUID(16)}`;
     this.#type = type;
-    this.#lane = lane;
+    this.#lane = enemy_lane_paths[lane];
     this.pos = pos;
     this.#hp = hp;
     this.#gold = gold;
@@ -37,6 +37,7 @@ export class Enemy {
     const { shape, text } = this.#draw();
     this.#shape = shape;
     this.#text = text;
+    this.move();
   }
 
   get id() {
@@ -67,9 +68,15 @@ export class Enemy {
 
     enemies_g.append(shape);
     enemies_g.append(text);
-    // this.move();
 
     return { shape, text };
+  }
+
+  move() {
+    // setInterval(() => {
+    //   this.#shape.setAttribute("transform", `translate(0, -${count++}) rotate(${this.rotation})`);
+    //   this.#text.setAttribute("transform", `translate(0, -${count++})`);
+    // }, 60);
   }
 
   getPoints() {

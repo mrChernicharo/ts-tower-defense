@@ -35,8 +35,8 @@ export class RingMenu {
     });
 
     document.addEventListener("on-wave-end", () => {
-      if (this.#game.selectedTile) {
-        this.#appendRingButtons(this.#game.selectedTile)
+      if (this.#game.selectedTile && this.#game.selectedTile.getMenuType() === "newPath") {
+        this.#appendRingButtons(this.#game.selectedTile);
       }
     });
   }
@@ -55,6 +55,7 @@ export class RingMenu {
       A ${TILE_WIDTH * 0.75}  ${TILE_WIDTH * 0.75} 0 1 1 ${TILE_WIDTH * 1.5} ${TILE_WIDTH * 0.7499}`
     );
     path.setAttribute("opacity", "0");
+    path.setAttribute("pointer-events", "none");
     // path.setAttribute("style", `transform: translate(-${ringOffset}px, -${ringOffset}px)`);
     return path;
   }
@@ -152,7 +153,12 @@ export class RingMenu {
     buttons.forEach(button => {
       button.onclick = (e: MouseEvent) => {
         // console.log("clicked menu button", { button, tile, menuType: tile.getMenuType() });
-        switch (tile.getMenuType()) {
+        const menuType = tile.getMenuType();
+        if (!menuType) return;
+        const ringMenuButtonClick = new CustomEvent("ring-menu-button-click", { detail: { e, menuType } });
+        document.dispatchEvent(ringMenuButtonClick);
+
+        switch (menuType) {
           case "newPath":
             this.#game.createNewPath(tile, button);
             break;
@@ -168,12 +174,10 @@ export class RingMenu {
   }
 
   translate(pos: Pos) {
-    this.#path.setAttribute(
-      "style",
-      `transform: translate(${pos.x - ringOffset}px, ${pos.y - ringOffset}px); pointer-events: none;`
-    );
+    this.#path.setAttribute("transform", `translate(${pos.x - ringOffset}, ${pos.y - ringOffset})`);
   }
   show() {
+
     this.#path.setAttribute("opacity", "0.5");
   }
   hide() {

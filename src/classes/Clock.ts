@@ -43,7 +43,6 @@ export class Clock {
       counter++;
     }
 
-    console.log(this.#frame);
     this.#frame = requestAnimationFrame(() => this.step());
   }
 }

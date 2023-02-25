@@ -1,3 +1,4 @@
+import { RingMenuType } from "../classes/RingMenu";
 import { Tile } from "../classes/Tile";
 
 interface CustomEventMap {
@@ -5,7 +6,7 @@ interface CustomEventMap {
   "show-ring-menu": CustomEvent<Tile>;
   "hide-ring-menu": CustomEvent<null>;
   "on-wave-end": CustomEvent<null>;
-  
+  "ring-menu-button-click": CustomEvent<{ e: MouseEvent; menuType: RingMenuType; }>;
 }
 //adds definition to Document
 declare global {

@@ -1,4 +1,4 @@
-#selection-ring-g {
+g#ring-menu-g path {
   animation: ring-grow;
   animation-duration: 0.2s;
   /* animation-timing-function: cubic-bezier(0.250, 0.460, 0.450, 0.940); */
@@ -12,4 +12,13 @@
 .ring-button:hover {
   cursor: pointer;
   filter: brightness(0.65);
+}
+
+@keyframes ring-grow {
+  0% {
+    scale: 0.75;
+  }
+  100% {
+    scale: 1;
+  }
 }

@@ -12,15 +12,14 @@ const player = new Player();
 const stageNumber = getStageNumberFromUrl() as StageKeys;
 const stageInfo = STAGES_AND_WAVES[stageNumber];
 
-const clockCallback = (frame: number, argB: any) => console.log({ frame, argB });
 
-const clock = new Clock(clockCallback);
-const game = new Game(stageInfo, clock);
+const game = new Game(stageInfo);
 new RingMenu(game);
 
-const enemy = new Enemy({ x: 250, y: 300 }, "goblin", "center");
+// const enemy = new Enemy({ x: 250, y: 300 }, "goblin", "center");
+// const enemy2 = new Enemy({ x: 150, y: 250 }, "troll", "center");
 
-console.log(player, game, clock, enemy);
+console.log(player, game);
 
 // clock.play();
 
