@@ -33,6 +33,8 @@ export function drawPath(points: Pos[], lane: EnemyLane, hasEnemyEntrance: boole
     // line
     if (prevPos?.x === pos.x || prevPos?.y === pos.y) {
       d += ` L ${pos.x} ${pos.y}`;
+      prevPos = pos;
+      continue
     }
     // bezier
     if (prevPos) {
@@ -71,6 +73,15 @@ export function drawPath(points: Pos[], lane: EnemyLane, hasEnemyEntrance: boole
     d += ` L ${entryPos.x} ${entryPos.y}`;
   }
   return d;
+}
+
+export function getAngle(sx: number, sy: number, ex: number, ey: number) {
+  let dy = ey - sy;
+  let dx = ex - sx;
+  let theta = Math.atan2(dy, dx);
+  theta *= 180 / Math.PI;
+  if (theta < 0) theta = 360 + theta;
+  return theta;
 }
 
 // export function drawPathEntrance(tile: Tile, points: Pos[], lane: EnemyLane) {

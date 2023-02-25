@@ -148,6 +148,7 @@ export class Game {
     });
 
     document.addEventListener("tile-clicked", (e: CustomEvent<Tile>) => {
+      console.log("tile-clicked", e.detail.pos.x, e.detail.pos.y);
       this.#lastSelectedTile = this.#selectedTile;
       this.#selectedTile = e.detail;
 
@@ -246,10 +247,6 @@ export class Game {
 
     if (barrierBroken) {
       this.#onWaveStart();
-
-      setTimeout(() => {
-        this.#onWaveEnd();
-      }, 10000);
     }
   }
 
@@ -280,8 +277,6 @@ export class Game {
     }
   }
 
-  drawPathEntrance() {}
-
   updateTilesVisibility() {
     const affectedTiles = this.tiles.filter(t => {
       const tileRow = Number(t.id.split("-")[1]) / TILE_WIDTH;
@@ -294,6 +289,7 @@ export class Game {
   }
 
   #onWaveStart() {
+    console.log("onWaveStart");
     this.updateTilesVisibility();
     this.#waveLine++;
     this.#inBattle = true;
@@ -309,24 +305,30 @@ export class Game {
   }
 
   #onWaveEnd() {
+    if (!this.#inBattle) return;
     this.#inBattle = false;
+    this.#clock.pause();
+    console.log("onWaveEnd", this.#waveNumber, this.waveTimes);
     this.waveTimes[this.#waveNumber].end = this.#clock.time;
 
-    this.#waveNumber++;
-    this.#clock.pause();
     play_pause_btn.setAttribute("disabled", "ok");
-    const onWaveEnd = new CustomEvent("on-wave-end", { detail: null });
-    document.dispatchEvent(onWaveEnd);
-
+    const onWaveEndEvent = new CustomEvent("on-wave-end", { detail: null });
+    document.dispatchEvent(onWaveEndEvent);
+    
     const lastTile = this.tileChain.at(-1)!;
     lastTile.isEnemyEntrance = false;
+    this.#waveNumber++;
   }
 
   #loopStep(frame: number, time: number, counter: number) {
+    if (this.currentWave.every(enemy => enemy.done)) {
+      return this.#onWaveEnd();
+    }
     // console.log(this.currentWave, frame);
     this.currentWave
       .filter(enemy => !enemy.spawned && time / 60 - this.waveTimes[this.waveNumber].start > enemy.delay)
       .forEach(enemy => {
+        this.enemies.push(enemy);
         enemy.spawn();
       });
 
@@ -391,16 +393,25 @@ export class Game {
       // }
     }
 
-    // for (let enemy of G.enemies) {
-    //   enemy.move();
+    for (let [i, enemy] of this.enemies.entries()) {
+      enemy.move();
 
-    //   if (enemy.hp <= 0) {
-    //     enemy.die();
-    //   }
+      // const {
+      //   progress,
+      //   rotation,
+      //   percProgress,
 
-    //   if (enemy.percProgress >= 100) {
-    //     enemy.finish();
-    //   }
-    // }
+      //   pos: { x, y },
+      // } = enemy;
+      // console.log({ percProgress, x, y });
+
+      if (enemy.hp <= 0) {
+        enemy.die();
+      }
+
+      if (enemy.percProgress >= 100) {
+        enemy.finish();
+      }
+    }
   }
 }

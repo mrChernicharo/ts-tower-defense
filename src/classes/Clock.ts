@@ -10,6 +10,9 @@ export class Clock {
   constructor(callback: any) {
     this.callback = callback;
   }
+  get speed() {
+    return this.#speed;
+  }
 
   get time() {
     return this.#time;

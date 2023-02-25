@@ -71,7 +71,7 @@ enum TileAssets {
 export class Tile {
   #id: string;
   #index: number;
-  #pos: Pos;
+  pos: Pos;
   #type: TileType;
   #shape: SVGRectElement;
   #defs: SVGDefsElement;
@@ -96,7 +96,7 @@ export class Tile {
   ) {
     this.#id = id;
     this.#index = index;
-    this.#pos = pos;
+    this.pos = pos;
     this.#type = type;
 
     this.isBlocked = type === "lava";
@@ -114,6 +114,8 @@ export class Tile {
       this.exits = this.getTileExits(prevTile);
     }
   }
+
+  
 
   #drawTile() {
     const patternId = `_tile-pattern-${this.id}`;
@@ -298,9 +300,6 @@ export class Tile {
 
   get id() {
     return this.#id;
-  }
-  get pos() {
-    return this.#pos;
   }
   get index() {
     return this.#index;

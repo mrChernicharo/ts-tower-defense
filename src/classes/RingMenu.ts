@@ -21,9 +21,9 @@ export class RingMenu {
 
   #appendEventListeners() {
     document.addEventListener("show-ring-menu", (e: CustomEvent<Tile>) => {
-      // console.log("show-ring-menu", pos);
+      console.log("show-ring-menu", e.detail, e.detail.pos.x, e.detail.pos.y);
       if (e.detail.isBlocked) return;
-      this.translate(e.detail.pos);
+      this.translate({ ...e.detail.pos });
       this.#appendRingButtons(e.detail);
       this.show();
     });
@@ -56,7 +56,6 @@ export class RingMenu {
     );
     path.setAttribute("opacity", "0");
     path.setAttribute("pointer-events", "none");
-    // path.setAttribute("style", `transform: translate(-${ringOffset}px, -${ringOffset}px)`);
     return path;
   }
 
@@ -177,7 +176,6 @@ export class RingMenu {
     this.#path.setAttribute("transform", `translate(${pos.x - ringOffset}, ${pos.y - ringOffset})`);
   }
   show() {
-
     this.#path.setAttribute("opacity", "0.5");
   }
   hide() {

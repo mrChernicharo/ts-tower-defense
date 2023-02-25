@@ -14,6 +14,71 @@ g#ring-menu-g path {
   filter: brightness(0.65);
 }
 
+
+.bullet-image {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+
+#toasts-area {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+}
+
+.toast {
+  text-align: right;
+  transition: opacity 1s;
+  font-size: 24px;
+  /* border: 1px solid red; */
+  padding: 0.5rem;
+  width: calc(100vw - 4rem);
+}
+
+#game-over-overlay {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: 3s;
+}
+
+#game-over-overlay:not(.hidden) {
+  align-items: center;
+  opacity: 0.9;
+  pointer-events: all;
+}
+
+.explosion {
+  opacity: 0.5;
+  animation: explosion 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes explosion {
+  0% {
+    fill: blueviolet;
+    scale: 0;
+  }
+  50% {
+    fill: red;
+    scale: 1;
+  }
+  100% {
+    fill: orange;
+    scale: 0;
+  }
+}
+
 @keyframes ring-grow {
   0% {
     scale: 0.75;

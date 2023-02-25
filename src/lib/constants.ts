@@ -321,6 +321,16 @@ export const STAGES_AND_WAVES = {
     },
     waves: [
       new WaveDefinition()
+        .defEnemySeq("dragon", "center", 1, 0),
+        // .defEnemySeq("dragon", "center", 1, 0)
+        // .defEnemySeq("goblin", "left", 1, 0)
+      // .defEnemySeq("goblin", "right", 6, 0, 5),
+
+      // .defEnemySeq("dragon", "center", 1, 0)
+      // .defEnemySeq("goblin", "left", 6, 0, 5)
+      // .defEnemySeq("goblin", "right", 6, 0, 5),
+
+      new WaveDefinition()
         .defEnemySeq("goblin", "left", 6, 0, 5)
         .defEnemySeq("goblin", "right", 6, 2.5, 5)
         .defEnemySeq("orc", "center", 2, 12, 12)
