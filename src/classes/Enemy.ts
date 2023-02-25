@@ -15,19 +15,22 @@ export class Enemy {
   #hp: number;
   #fill: string;
   #size: number;
+  #spawned = false;
+  delay: number;
   pos: Pos;
   done = false;
   rotation = -90;
   percProgress = 0;
   speed: number;
   progress = 0;
-  constructor(pos: Pos, type: EnemyType, lane: EnemyLane) {
+  constructor(pos: Pos, type: EnemyType, lane: EnemyLane, delay: number) {
     const { hp, gold, speed, fill, size } = ENEMIES[type];
 
     this.#id = `${type}-${generateUUID(16)}`;
     this.#type = type;
     this.#lane = enemy_lane_paths[lane];
     this.pos = pos;
+    this.delay = delay;
     this.#hp = hp;
     this.#gold = gold;
     this.speed = speed;
@@ -49,6 +52,9 @@ export class Enemy {
   get fill() {
     return this.#fill;
   }
+  get spawned() {
+    return this.#spawned;
+  }
 
   #draw() {
     const shape = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
@@ -66,8 +72,7 @@ export class Enemy {
     text.setAttribute("y", String(this.pos.y + 15));
     text.textContent = this.hp.toFixed(0);
 
-    enemies_g.append(shape);
-    enemies_g.append(text);
+
 
     return { shape, text };
   }
@@ -88,5 +93,11 @@ export class Enemy {
       { x: x + this.#size * 2, y },
     ];
     return points.map(p => `${Math.trunc(p.x)} ${Math.trunc(p.y)} `).join("");
+  }
+
+  spawn() {
+    this.#spawned = true;
+    enemies_g.append(this.#shape);
+    enemies_g.append(this.#text);
   }
 }

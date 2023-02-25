@@ -10,28 +10,25 @@ import {
 } from "../lib/DOM_elements";
 import { drawPath } from "../lib/helpers";
 import { Clock } from "./Clock";
+import { Enemy } from "./Enemy";
 import { IconDirection } from "./RingMenu";
 import { Pos, Tile, TileType } from "./Tile";
+import { WaveDefinition, WaveEnemy, WaveTimes } from "./WaveDefinition";
 
 type StageInfo = typeof STAGES_AND_WAVES[keyof typeof STAGES_AND_WAVES];
 
 export class Game {
-  // frameId = 0;
-  // tick = 0;
-  // clock = 0;
-  // mouse = { x: null; y: null };
-  // lastClick = { x: null; y: null };
-  // enemies = [];
-  // towers = [];
-  // bullets = [];
   tiles: Tile[];
+  enemies: Enemy[] = [];
+  // tower: Tower[] = [];
+  // bullets: Bullet[] = [];
   // bulletCount = 0;
+  // towerPreviewActive = false;
+  #waves: WaveDefinition[];
   tileChain: Tile[];
   #selectedTile: Tile | null = null;
   #lastSelectedTile: Tile | null = null;
-  // isPlaying = false;
   #inBattle = false;
-  // towerPreviewActive = false;
   #stageName: string;
   #stageNumber: number;
   #rows: number;
@@ -44,6 +41,8 @@ export class Game {
   #waveLine: number;
   #waveNumber = 0;
   #clock: Clock;
+  currentWave: Enemy[] = [];
+  waveTimes: WaveTimes[] = [];
   // wavesTimes = [{ start: 0; end: null }];
   // gameSpeed = 2;
 
@@ -64,6 +63,7 @@ export class Game {
 
     this.#wallTiles = wallTiles;
     this.#blockedTiles = blockedTiles;
+    this.#waves = waves;
 
     stage_number_span.textContent = `Stage ${this.#stageNumber}`;
     stage_name_span.textContent = `${this.#stageName}`;
@@ -86,6 +86,9 @@ export class Game {
   }
   get selectedTile() {
     return this.#selectedTile;
+  }
+  get waveNumber() {
+    return this.#waveNumber;
   }
 
   #createGrid() {
@@ -232,8 +235,8 @@ export class Game {
     const prevTile = this.tileChain.at(-1);
 
     if (!prevTile || !nextTile) return;
-    this.tiles[nextTile.index].becomePathEnd(prevTile);
-    this.tiles[prevTile.index].becomePathSegment(nextTile);
+    this.tiles[nextTile.index].turnIntoPathEnd(prevTile);
+    this.tiles[prevTile.index].turnIntoPathSegment(nextTile);
     this.tileChain.push(nextTile);
 
     this.updateEnemyLanes();
@@ -244,9 +247,9 @@ export class Game {
     if (barrierBroken) {
       this.#onWaveStart();
 
-      setTimeout(() => {
-        this.#onWaveEnd();
-      }, 4000);
+      // setTimeout(() => {
+      //   this.#onWaveEnd();
+      // }, 3000);
     }
   }
 
@@ -287,17 +290,110 @@ export class Game {
     this.#inBattle = true;
     this.#clock.play();
     play_pause_btn.removeAttribute("disabled");
+
+    this.waveTimes.push({ start: this.#clock.time, end: null });
+
+    const lastTile = this.tileChain.at(-1)!;
+    lastTile.isEnemyEntrance = true;
+
+    this.currentWave = this.#waves[this.#waveNumber].wave.map(
+      enemy => new Enemy(lastTile.pos, enemy.type, enemy.lane, enemy.delay)
+    );
   }
 
   #onWaveEnd() {
     this.#inBattle = false;
+    this.waveTimes[this.#waveNumber].end = this.#clock.time;
+
+    this.#waveNumber++;
     this.#clock.pause();
     play_pause_btn.setAttribute("disabled", "ok");
     const onWaveEnd = new CustomEvent("on-wave-end", { detail: null });
     document.dispatchEvent(onWaveEnd);
+
+    const lastTile = this.tileChain.at(-1)!;
+    lastTile.isEnemyEntrance = false;
   }
 
-  #loopStep(frame: number, counter: number) {
-    console.log("loop update", this, frame, counter);
+  #loopStep(frame: number, time: number, counter: number) {
+    // console.log()
+    this.currentWave
+      .filter(enemy => !enemy.spawned && time / 60 - this.waveTimes[this.waveNumber].start > enemy.delay)
+      .forEach(enemy => {
+        enemy.spawn();
+      });
+
+    // console.log("loop update", this, { frame, time, counter });
+    {
+      // for (let tower of G.towers) {
+      //   let elapsedSinceLastShot = G.clock - tower.lastShot;
+      //   let farthestEnemy = null;
+      //   let greatestProgress = -Infinity;
+      //   let angle = null;
+      //   let distanceToEnemyInDeg = null;
+      //   for (let enemy of G.enemies) {
+      //     const d = getDistance(tower.pos.x, tower.pos.y, enemy.pos.x, enemy.pos.y);
+      //     const enemyInRange = d < tower.range;
+      //     if (enemyInRange) {
+      //       if (enemy.progress > greatestProgress) {
+      //         greatestProgress = enemy.progress;
+      //         farthestEnemy = enemy;
+      //       }
+      //     }
+      //   }
+      //   const targetEnemy = farthestEnemy; // or other strategies?
+      //   const diff = tower.cooldown - elapsedSinceLastShot;
+      //   const freshCooldown = tower.shotsPerSecond * 60;
+      //   if (targetEnemy) {
+      //     angle = getAngle(
+      //       tower.pos.x,
+      //       tower.pos.y,
+      //       targetEnemy.pos.x,
+      //       targetEnemy.pos.y
+      //     );
+      //     distanceToEnemyInDeg = getDistanceBetweenAngles(tower.rotation, angle);
+      //     tower.rotateTowardsEnemy(angle);
+      //   }
+      //   const enemyInSight = distanceToEnemyInDeg < 10;
+      //   if (tower.cooldown > 0) {
+      //     tower.cooldown = diff;
+      //   } else if (tower.cooldown <= 0 && targetEnemy && enemyInSight) {
+      //     // console.log("SHOOT!");
+      //     tower.cooldown = freshCooldown;
+      //     tower.lastShot = G.clock;
+      //     const newBullet = createBullet(tower, targetEnemy);
+      //     G.bullets.push(newBullet);
+      //   }
+      // }
+    }
+
+    {
+      // for (let [b, bullet] of G.bullets.entries()) {
+      //   bullet.move();
+      //   // prettier-ignore
+      //   const distance = getDistance(bullet.pos.x, bullet.pos.y, bullet.enemy.pos.x, bullet.enemy.pos.y);
+      //   if (distance < bullet.enemy.size) {
+      //     // console.log("HIT!", bullet);
+      //     // tower.gainXp()
+      //     bullet.hit(bullet.enemy);
+      //     if (bullet.type === "earth") {
+      //       const nearbyEnemies = getNearbyEnemies(bullet, EXPLOSION_RADIUS);
+      //       bullet.handleExplosion(nearbyEnemies);
+      //     }
+      //   }
+      // }
+    }
+
+    // for (let enemy of G.enemies) {
+    //   enemy.move();
+
+    //   if (enemy.hp <= 0) {
+    //     enemy.die();
+    //   }
+
+    //   if (enemy.percProgress >= 100) {
+    //     enemy.finish();
+    //   }
+    // }
   }
 }

@@ -1,13 +1,18 @@
 import { play_pause_btn } from "../lib/DOM_elements";
 
-let counter = 0;
+let counter = 1;
 export class Clock {
   #speed = 1;
   #frame = 1;
+  #time = 0;
   isPlaying = false;
   callback: (...arg: any) => void;
   constructor(callback: any) {
     this.callback = callback;
+  }
+
+  get time() {
+    return this.#time;
   }
 
   play() {
@@ -17,6 +22,7 @@ export class Clock {
     this.step();
   }
   pause() {
+    console.log("paused at", this.time);
     cancelAnimationFrame(this.#frame);
     this.isPlaying = false;
     play_pause_btn.textContent = "▶️";
@@ -34,12 +40,13 @@ export class Clock {
   }
 
   step() {
+    this.#time = this.#frame * 1.6666;
     if (
       this.#speed === 4 ||
       (this.#speed === 2 && this.#frame % 2 === 0) ||
       (this.#speed === 1 && this.#frame % 4 === 0)
     ) {
-      this.callback(this.#frame, counter);
+      this.callback(this.#frame, this.#time, counter);
       counter++;
     }
 

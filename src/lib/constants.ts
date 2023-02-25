@@ -85,7 +85,7 @@ export const RING_MENU_ICONS = {
     {
       id: "sell-icon",
       type: "sell",
-      x: TILE_WIDTH * 0.1, // 10, 
+      x: TILE_WIDTH * 0.1, // 10,
       y: TILE_WIDTH * 1.15, // 115,
       color: "gold",
       img: "/assets/icons/sack-dollar.svg",
@@ -94,7 +94,7 @@ export const RING_MENU_ICONS = {
       id: "info-icon",
       type: "info",
       x: TILE_WIDTH * 1.4, // 140,
-      y: TILE_WIDTH * 1.15, // 115, 
+      y: TILE_WIDTH * 1.15, // 115,
       color: "#ddd",
       img: "/assets/icons/book.svg",
     },
@@ -288,7 +288,7 @@ export const STAGES_AND_WAVES = {
     },
     waves: [
       new WaveDefinition().defEnemySeq("goblin", "left", 10, 0, 3).defEnemySeq("goblin", "center", 10, 10, 3).build(),
-      new WaveDefinition().defEnemySeq("goblin", "center", 8, 5).defEnemySeq("orc", "center", 1, 12, 2).build(),
+      new WaveDefinition().defEnemySeq("goblin", "center", 8, 5).defEnemySeq("orc", "center", 6, 12, 2).build(),
       new WaveDefinition()
         .defEnemySeq("goblin", "left", 6, 5)
         .defEnemySeq("goblin", "right", 6, 1, 5)

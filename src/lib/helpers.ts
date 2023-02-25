@@ -3,7 +3,7 @@ import { TILE_WIDTH } from "./constants";
 
 export function generateUUID(digits: number) {
   let str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVXZ";
-  let uuid = [];
+  let uuid: string[] = [];
   for (let i = 0; i < digits; i++) {
     uuid.push(str[Math.floor(Math.random() * str.length)]);
   }
@@ -23,7 +23,7 @@ export function getStageNumberFromUrl() {
 
 export function drawPath(points: Pos[], lane: EnemyLane) {
   let d = "";
-  let prevPos = null;
+  let prevPos: Pos | null = null;
 
   for (const [i, pos] of points.entries()) {
     if (i === 0) {
@@ -32,7 +32,6 @@ export function drawPath(points: Pos[], lane: EnemyLane) {
     }
     // line
     if (prevPos?.x === pos.x || prevPos?.y === pos.y) {
-      console.log("line");
       d += ` L ${pos.x} ${pos.y}`;
     }
     // bezier

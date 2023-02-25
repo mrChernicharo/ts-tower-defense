@@ -1,9 +1,22 @@
+import { EnemyType } from "./Enemy";
+import { EnemyLane } from "./Tile";
+
+export interface WaveEnemy {
+  type: EnemyType;
+  lane: EnemyLane;
+  delay: number;
+}
+
+export interface WaveTimes {
+  start: number; end: number | null;
+}
+
 export class WaveDefinition {
-  wave: any[] = [];
+  wave: WaveEnemy[] = [];
 
   defEnemySeq(
-    enemyType: string,
-    lane: "left" | "center" | "right",
+    enemyType: EnemyType,
+    lane: EnemyLane,
     quantity: number,
     startingAtInSeconds: number,
     intervalInSeconds = 1

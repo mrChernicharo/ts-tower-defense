@@ -241,8 +241,8 @@ export class Tile {
     return { left, center, right };
   }
 
-  becomePathSegment(nextTile: Tile) {
-    console.log("becomePathSegment"), { curr: this, nextTile };
+  turnIntoPathSegment(nextTile: Tile) {
+    // console.log("becomePathSegment"), { curr: this, nextTile };
     this.#connected = true;
 
     const vegetation = this.type.split("-")[0];
@@ -265,14 +265,14 @@ export class Tile {
 
     const prevDir = translatePrevDir(rawPrevDir);
 
-    console.log({ rawPrevDir, prevDir, nextDir });
+    // console.log({ rawPrevDir, prevDir, nextDir });
 
     this.#type = `${vegetation}-path-${prevDir}${nextDir}` as TileType;
     this.#image.setAttribute("href", TileAssets[this.type]);
   }
 
-  becomePathEnd(prevTile: Tile) {
-    console.log("becomePathEnd", { curr: this, prevTile });
+  turnIntoPathEnd(prevTile: Tile) {
+    // console.log("becomePathEnd", { curr: this, prevTile });
 
     const getDirection = (index: number) => {
       if (index - this.index === 1) return "L";
