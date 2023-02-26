@@ -171,24 +171,15 @@ export class Tile {
   }
 
   focus() {
-    this.#shape.setAttribute("opacity", "0.6");
-    // this.#shape.setAttribute("style", `filter: drop-shadow(0 0 12px #88f);`);
-    const tile = this;
-    console.log({ tile, x: tile.pos.x, y: tile.pos.y });
-    const showRingMenu = new CustomEvent("show-ring-menu", { detail: tile });
+    const showRingMenu = new CustomEvent("show-ring-menu", { detail: this });
     document.dispatchEvent(showRingMenu);
+    this.#shape.setAttribute("opacity", "0.6");
   }
 
   blur() {
-    this.#shape.setAttribute("opacity", this.#isVisible ? "1" : "0.4");
-
-    // this.#shape.setAttribute("style", `filter: drop-shadow(0 0 0 #88f);`);
     const hideRingMenu = new CustomEvent("hide-ring-menu", { detail: null });
     document.dispatchEvent(hideRingMenu);
-    // let waveLine = G.waveNumber + STAGES_AND_WAVES[G.stageNumber].stage.firstWaveAtRow;
-    // const afterWaveLineAndInvisible = row >= waveLine && !this.visible && !this.enemyEntrance;
-    // this.shape.setAttribute("opacity", afterWaveLineAndInvisible ? 0.4 : 1);
-    // this.shape.setAttribute("style", `filter: drop-shadow(0 0 0 #88f);`);
+    this.#shape.setAttribute("opacity", this.#isVisible ? "1" : "0.4");
   }
 
   canBecomePath() {
