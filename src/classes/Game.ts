@@ -175,6 +175,9 @@ export class Game {
         case "fast":
           this.#clock.changeSpeed(2);
           break;
+        case "faster":
+          this.#clock.changeSpeed(4);
+          break;
       }
     };
 
@@ -335,19 +338,25 @@ export class Game {
     console.log("onWaveEnd after", { waveNumber: this.#waveNumber, waveTimes: this.waveTimes, time: this.#clock.time });
   }
 
-  #loopStep(frame: number, time: number) {
-    // if (!this.waveTimes[this.#waveNumber]) return;
+  #loopStep(frame: number, time: number, speed: number) {
     if (this.#inBattle && this.currentWave.every(enemy => enemy.done)) {
       this.#onWaveEnd();
       return;
     }
-    // console.log({ time, by60: time / 60, waveTimeStart: this.waveTimes[this.#waveNumber]?.start });
-    this.currentWave
-      .filter(enemy => !enemy.spawned && (time - this.waveTimes[this.#waveNumber].start) / 60 > enemy.delay)
-      .forEach(enemy => {
+
+    const waveStart = this.waveTimes[this.#waveNumber].start;
+    const elapsedWaveTime = time - waveStart;
+
+    // console.log(elapsedWaveTime.toFixed(0));
+
+    const spawningEnemies = this.currentWave.filter(enemy => !enemy.spawned && elapsedWaveTime > enemy.delay);
+
+    if (spawningEnemies.length) {
+      spawningEnemies.forEach(enemy => {
         this.enemies.push(enemy);
         enemy.spawn();
       });
+    }
 
     // console.log("loop update", this, { frame, time, counter });
     {
@@ -411,7 +420,8 @@ export class Game {
     }
 
     for (let [i, enemy] of this.enemies.entries()) {
-      enemy.move();
+      enemy.move(speed);
+      //   // enemy.move(speed);
 
       if (enemy.hp <= 0) {
         enemy.die();

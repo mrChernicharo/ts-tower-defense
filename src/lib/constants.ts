@@ -193,7 +193,7 @@ export const ENEMIES = {
   },
   orc: {
     name: "orc",
-    speed: 8,
+    speed: 7,
     hp: 200,
     gold: 7,
     fill: "darkgreen",
@@ -201,7 +201,7 @@ export const ENEMIES = {
   },
   troll: {
     name: "troll",
-    speed: 5,
+    speed: 4,
     hp: 500,
     gold: 20,
     fill: "#041",
@@ -209,7 +209,7 @@ export const ENEMIES = {
   },
   dragon: {
     name: "dragon",
-    speed: 2.5,
+    speed: 2,
     hp: 2500,
     gold: 20,
     fill: "purple",
@@ -324,11 +324,11 @@ export const STAGES_AND_WAVES = {
         // .defEnemySeq("dragon", "center", 1, 0),
         // .defEnemySeq("dragon", "center", 1, 0)
         // .defEnemySeq("goblin", "left", 1, 0)
-      // .defEnemySeq("goblin", "right", 6, 0, 5),
+        // .defEnemySeq("goblin", "right", 6, 0, 5),
 
-      // .defEnemySeq("dragon", "center", 1, 0)
-      // .defEnemySeq("goblin", "left", 6, 0, 5)
-      .defEnemySeq("goblin", "right", 6, 0, 1),
+        // .defEnemySeq("dragon", "center", 1, 0)
+        // .defEnemySeq("goblin", "left", 6, 0, 5)
+        .defEnemySeq("goblin", "right", 60, 0, 1),
 
       new WaveDefinition()
         .defEnemySeq("goblin", "left", 6, 0, 5)
@@ -413,7 +413,7 @@ export const STAGES_AND_WAVES = {
     stage: {
       number: 5,
       name: "Piemont Square",
-      firstWaveAtRow: 2,
+      firstWaveAtRow: 1,
       entrypoint: 1,
       cols: 3,
       baseTile: "grass",
@@ -421,7 +421,7 @@ export const STAGES_AND_WAVES = {
     },
     blockedTiles: {},
     wallTiles: {
-      2: [0, 1],
+      2: [0, 2],
       4: [1, 2],
     },
     waves: [

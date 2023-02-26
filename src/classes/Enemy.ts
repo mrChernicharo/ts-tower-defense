@@ -35,7 +35,7 @@ export class Enemy {
     this.speed = speed;
     this.#fill = fill;
     this.#size = size;
-    
+
     // this.#shape = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
     this.#shape = document.createElementNS("http://www.w3.org/2000/svg", "circle");
     this.#text = document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -79,13 +79,12 @@ export class Enemy {
     this.#shape.setAttribute("display", "none");
     this.#text.setAttribute("display", "none");
 
-
     enemies_g.append(this.#shape);
     enemies_g.append(this.#text);
   }
 
-  move() {
-    const prog = this.#lane.getTotalLength() - (this.#lane.getTotalLength() - (this.progress + this.speed * 0.5));
+  move(gameSpeed: number) {
+    const prog = this.#lane.getTotalLength() - (this.#lane.getTotalLength() - (this.progress + this.speed * gameSpeed * 0.1));
     const { x, y } = this.#lane.getPointAtLength(this.#lane.getTotalLength() - prog);
 
     // update enemies' progress
