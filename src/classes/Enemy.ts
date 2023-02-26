@@ -4,12 +4,11 @@ import { generateUUID, getAngle } from "../lib/helpers";
 import { EnemyLane, Pos } from "./Tile";
 
 export type EnemyType = "goblin" | "orc" | "troll" | "dragon";
-let count = 0;
 export class Enemy {
   #type: EnemyType;
   #id: string;
   #lane: SVGPathElement;
-  #shape: SVGPolygonElement;
+  #shape: SVGCircleElement;
   #gold: number;
   #text: SVGTextElement;
   #hp: number;
@@ -36,13 +35,13 @@ export class Enemy {
     this.speed = speed;
     this.#fill = fill;
     this.#size = size;
-    this.#shape = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    
+    // this.#shape = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    this.#shape = document.createElementNS("http://www.w3.org/2000/svg", "circle");
     this.#text = document.createElementNS("http://www.w3.org/2000/svg", "text");
     this.#shape.setAttribute("id", this.#id);
 
     this.#draw();
-
-    // this.move();
   }
 
   get id() {
@@ -69,13 +68,17 @@ export class Enemy {
     this.#shape.setAttribute("data-hp", String(this.hp));
     this.#shape.setAttribute("data-entity", "enemy");
     this.#shape.setAttribute("fill", this.fill);
-    this.#shape.setAttribute("style", "transform-box: fill-box; transform-origin: center");
-    this.#shape.setAttribute("transform", `rotate(-90)`);
-    this.#shape.setAttribute("transition", `0.1s`);
+    this.#shape.setAttribute("r", String(this.#size));
+    this.#shape.setAttribute("cx", String(this.#pos.x));
+    this.#shape.setAttribute("cy", String(this.#pos.y));
 
     this.#text.setAttribute("x", String(this.#pos.x));
     this.#text.setAttribute("y", String(this.#pos.y + 15));
     this.#text.textContent = this.hp.toFixed(0);
+
+    this.#shape.setAttribute("display", "none");
+    this.#text.setAttribute("display", "none");
+
 
     enemies_g.append(this.#shape);
     enemies_g.append(this.#text);
@@ -83,45 +86,20 @@ export class Enemy {
 
   move() {
     const prog = this.#lane.getTotalLength() - (this.#lane.getTotalLength() - (this.progress + this.speed * 0.5));
-
-    const nextPos = this.#lane.getPointAtLength(this.#lane.getTotalLength() - prog);
-    // const nextPos = { x, y };
-
-    // get enemy facing angle: find angle considering pos and nextPos
-    const rotation = getAngle(this.#pos.x, this.#pos.y, nextPos.x, nextPos.y);
+    const { x, y } = this.#lane.getPointAtLength(this.#lane.getTotalLength() - prog);
 
     // update enemies' progress
-    this.percProgress = (prog / this.#lane.getTotalLength()) * 100;
     this.progress = prog;
+    this.percProgress = (prog / this.#lane.getTotalLength()) * 100;
+    this.#pos.x = x;
+    this.#pos.y = y;
 
-    // this.#pos.x = nextPos.x; <== this is generating some MAJOR WONK!
-    // this.#pos.y = nextPos.y; <== this is generating some MAJOR WONK!
-    
-    this.#text.setAttribute("x", String(nextPos.x));
-    this.#text.setAttribute("y", String(nextPos.y));
+    this.#shape.setAttribute("cx", String(this.#pos.x));
+    this.#shape.setAttribute("cy", String(this.#pos.y));
+
+    this.#text.setAttribute("x", String(this.#pos.x));
+    this.#text.setAttribute("y", String(this.#pos.y));
     this.#text.textContent = this.hp.toFixed(0);
-
-    // console.log({
-    //   totalLen: this.#lane.getTotalLength(),
-    //   prog,
-    //   initialPoint: this.#lane.getPointAtLength(0),
-    //   finalPoint: this.#lane.getPointAtLength(this.#lane.getTotalLength()),
-    //   lane: this.#lane,
-    // });
-
-    // this.#shape.setAttribute("transform", `rotate(-90)`);
-    this.#shape.setAttribute(
-      "transform",
-      ` translate(${nextPos.x - this.#pos.x},${nextPos.y - this.#pos.y}) rotate(${rotation})`
-    );
-    // this.#shape.setAttribute("points", this.getPoints());
-    // this.#pos.x = nextPos.x;
-    // this.#pos.y = nextPos.y;
-
-    // this.#shape.setAttribute("transform", `rotate(${rotation})`);
-    // translate(${nextPos.x},${nextPos.y})
-    // `translate(${nextPos.x - this.#size / 2},${nextPos.y - TILE_WIDTH * 3})
-    // console.log({ prog, totalLength: this.#lane.getTotalLength(), nextPos, rotation: this.rotation });
   }
 
   getPoints() {
@@ -136,14 +114,20 @@ export class Enemy {
   }
 
   spawn() {
+    this.#shape.setAttribute("display", "block");
+    this.#text.setAttribute("display", "block");
     this.#spawned = true;
   }
 
-  die() {}
+  die() {
+    this.done = true;
+    this.#text.remove();
+    this.#shape.remove();
+  }
 
   finish() {
     this.done = true;
-    this.#shape.setAttribute("transform", `rotate(-90)`);
+    this.#text.remove();
     this.#shape.remove();
   }
 }

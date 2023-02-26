@@ -115,7 +115,6 @@ export class Tile {
     }
   }
 
-  
   get id() {
     return this.#id;
   }
@@ -174,7 +173,9 @@ export class Tile {
   focus() {
     this.#shape.setAttribute("opacity", "0.6");
     // this.#shape.setAttribute("style", `filter: drop-shadow(0 0 12px #88f);`);
-    const showRingMenu = new CustomEvent("show-ring-menu", { detail: this });
+    const tile = this;
+    console.log({ tile, x: tile.pos.x, y: tile.pos.y });
+    const showRingMenu = new CustomEvent("show-ring-menu", { detail: tile });
     document.dispatchEvent(showRingMenu);
   }
 
@@ -271,7 +272,7 @@ export class Tile {
     if (!nextDir || !rawPrevDir || (vegetation !== "grass" && vegetation !== "dirt"))
       throw Error("becomePathSegment needs to be called after becomePathEnd, we need info from the next path here");
 
-    const translatePrevDir = (rawPrevDir: "B" | "L" | "R") => {
+    const parsePrevDir = (rawPrevDir: "B" | "L" | "R") => {
       switch (rawPrevDir) {
         case "B":
           return "T";
@@ -282,7 +283,7 @@ export class Tile {
       }
     };
 
-    const prevDir = translatePrevDir(rawPrevDir);
+    const prevDir = parsePrevDir(rawPrevDir);
 
     // console.log({ rawPrevDir, prevDir, nextDir });
 
@@ -314,6 +315,4 @@ export class Tile {
     this.#isVisible = value;
     this.#shape.setAttribute("opacity", this.#isVisible ? "1" : "0.4");
   }
-
-
 }

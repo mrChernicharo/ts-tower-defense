@@ -1,6 +1,5 @@
 import { play_pause_btn } from "../lib/DOM_elements";
 
-let counter = 1;
 export class Clock {
   #speed = 1;
   #frame = 1;
@@ -21,38 +20,33 @@ export class Clock {
   play() {
     this.isPlaying = true;
     play_pause_btn.textContent = "⏸";
-
     this.step();
+
+    console.log("play at", { time: this.time, frame: this.#frame, speed: this.#speed });
   }
   pause() {
-    console.log("paused at", this.time);
-    cancelAnimationFrame(this.#frame);
     this.isPlaying = false;
     play_pause_btn.textContent = "▶️";
-  }
-  reset() {
-    this.#frame = 0;
-    this.isPlaying = false;
-    counter = 0;
+    cancelAnimationFrame(this.#frame);
+    console.log("paused at", { time: this.time, frame: this.#frame, speed: this.#speed });
   }
 
-  changeSpeed(speed: 1 | 2 | 4) {
+
+  changeSpeed(speed: 1 | 2) {
     console.log("changeSpeed", speed);
     this.#speed = speed;
-    counter = 0;
   }
 
   step() {
     this.#time = this.#frame * 1.6666;
-    if (
-      this.#speed === 4 ||
-      (this.#speed === 2 && this.#frame % 2 === 0) ||
-      (this.#speed === 1 && this.#frame % 4 === 0)
-    ) {
-      this.callback(this.#frame, this.#time, counter);
-      counter++;
+    // console.log({ t: this.#time, f: this.#frame });
+
+    if (this.#speed === 2 || (this.#speed === 1 && this.#frame % 2 === 0)) {
+      this.callback(this.#frame, this.#time);
     }
 
-    this.#frame = requestAnimationFrame(() => this.step());
+    if (this.isPlaying) {
+      this.#frame = requestAnimationFrame(() => this.step());
+    }
   }
 }

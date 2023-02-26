@@ -11,6 +11,7 @@ const ringOffset = TILE_WIDTH * 0.25;
 export class RingMenu {
   #path: SVGPathElement;
   #game: Game;
+  pos: Pos = { x: 0, y: 0 };
 
   constructor(game: Game) {
     this.#game = game;
@@ -21,11 +22,12 @@ export class RingMenu {
 
   #appendEventListeners() {
     document.addEventListener("show-ring-menu", (e: CustomEvent<Tile>) => {
-      console.log("show-ring-menu", e.detail, e.detail.pos.x, e.detail.pos.y);
+      // console.log("show-ring-menu", e.detail, e.detail.pos.x, e.detail.pos.y);
       if (e.detail.isBlocked) return;
-      this.translate({ x: e.detail.pos.x, y: e.detail.pos.y });
+
       this.#appendRingButtons(e.detail);
       this.show();
+      this.translate({ x: e.detail.pos.x, y: e.detail.pos.y });
     });
 
     document.addEventListener("hide-ring-menu", () => {
@@ -173,7 +175,9 @@ export class RingMenu {
   }
 
   translate(pos: Pos) {
-    this.#path.setAttribute("transform", `translate(${pos.x - ringOffset}, ${pos.y - ringOffset})`);
+    // console.log("translate", { x: pos.x, y: pos.y, t: this });
+    this.pos = pos;
+    this.#path.setAttribute("transform", `translate(${this.pos.x - ringOffset}, ${this.pos.y - ringOffset})`);
   }
   show() {
     this.#path.setAttribute("opacity", "0.5");

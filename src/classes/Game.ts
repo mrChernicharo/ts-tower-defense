@@ -47,7 +47,7 @@ export class Game {
   // gameSpeed = 2;
 
   constructor(stageInfo: StageInfo) {
-    console.log({ stageInfo });
+    // console.log({ stageInfo });
     const { stage, blockedTiles, wallTiles, waves } = stageInfo;
     const { name, number, cols, rows, baseTile, entrypoint, firstWaveAtRow } = stage;
 
@@ -149,7 +149,7 @@ export class Game {
     });
 
     document.addEventListener("tile-clicked", (e: CustomEvent<Tile>) => {
-      console.log("tile-clicked", e.detail.pos.x, e.detail.pos.y);
+      // console.log("tile-clicked", e.detail.pos.x, e.detail.pos.y);
       this.#lastSelectedTile = this.#selectedTile;
       this.#selectedTile = e.detail;
 
@@ -174,9 +174,6 @@ export class Game {
           break;
         case "fast":
           this.#clock.changeSpeed(2);
-          break;
-        case "faster":
-          this.#clock.changeSpeed(4);
           break;
       }
     };
@@ -275,7 +272,7 @@ export class Game {
 
     if (hasEnemyEntrance) {
       lastTile.isEnemyEntrance = true;
-      console.log(this.tiles, this.tileChain, lastTile.index);
+      // console.log(this.tiles, this.tileChain, lastTile.index);
     }
   }
 
@@ -291,24 +288,41 @@ export class Game {
   }
 
   #onWaveStart() {
+    console.log("onWaveStart init", {
+      waveNumber: this.#waveNumber,
+      waveTimes: this.waveTimes,
+      time: this.#clock.time,
+    });
+
     this.updateTilesVisibility();
     this.#waveLine++;
-    this.#clock.play();
     play_pause_btn.removeAttribute("disabled");
 
     this.waveTimes = [...this.waveTimes, { start: this.#clock.time, end: null }];
-    console.log("onWaveStart", this.#waveNumber, this.waveTimes);
 
     const lastTile = this.tileChain.at(-1)!;
+    const enemyPos = { x: lastTile.pos.x, y: lastTile.pos.y }; // passing lastTile.pos directly will cause nasty bugs!
+
     this.currentWave = this.#waves[this.#waveNumber].wave.map(
-      enemy => new Enemy(lastTile.pos, enemy.type, enemy.lane, enemy.delay)
+      enemy => new Enemy(enemyPos, enemy.type, enemy.lane, enemy.delay)
     );
+
+    this.#clock.play();
+
     this.#inBattle = true;
+    console.log("onWaveStart after", {
+      waveNumber: this.#waveNumber,
+      waveTimes: this.waveTimes,
+      time: this.#clock.time,
+    });
   }
 
   #onWaveEnd() {
+    console.log("onWaveEnd init", { waveNumber: this.#waveNumber, waveTimes: this.waveTimes, time: this.#clock.time });
+    this.#clock.pause();
+
     this.#inBattle = false;
-    console.log("onWaveEnd", this.#waveNumber, this.waveTimes);
+
     this.waveTimes[this.#waveNumber].end = this.#clock.time;
 
     play_pause_btn.setAttribute("disabled", "ok");
@@ -318,17 +332,18 @@ export class Game {
     const lastTile = this.tileChain.at(-1)!;
     lastTile.isEnemyEntrance = false;
     this.#waveNumber++;
+    console.log("onWaveEnd after", { waveNumber: this.#waveNumber, waveTimes: this.waveTimes, time: this.#clock.time });
   }
 
-  #loopStep(frame: number, time: number, counter: number) {
-    if (!this.waveTimes[this.#waveNumber]) return;
+  #loopStep(frame: number, time: number) {
+    // if (!this.waveTimes[this.#waveNumber]) return;
     if (this.#inBattle && this.currentWave.every(enemy => enemy.done)) {
-      this.#clock.pause();
-      return this.#onWaveEnd();
+      this.#onWaveEnd();
+      return;
     }
-    console.log({ time, by60: time / 60, waveTimeStart: this.waveTimes[this.#waveNumber]?.start });
+    // console.log({ time, by60: time / 60, waveTimeStart: this.waveTimes[this.#waveNumber]?.start });
     this.currentWave
-      .filter(enemy => !enemy.spawned && time / 60 - this.waveTimes[this.#waveNumber].start > enemy.delay)
+      .filter(enemy => !enemy.spawned && (time - this.waveTimes[this.#waveNumber].start) / 60 > enemy.delay)
       .forEach(enemy => {
         this.enemies.push(enemy);
         enemy.spawn();
@@ -397,15 +412,6 @@ export class Game {
 
     for (let [i, enemy] of this.enemies.entries()) {
       enemy.move();
-
-      // const {
-      //   progress,
-      //   rotation,
-      //   percProgress,
-
-      //   pos: { x, y },
-      // } = enemy;
-      // console.log({ percProgress, x, y });
 
       if (enemy.hp <= 0) {
         enemy.die();
