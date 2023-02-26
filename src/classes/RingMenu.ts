@@ -166,7 +166,7 @@ export class RingMenu {
             this.#game.createNewPath(tile, button);
             break;
           case "newTower":
-            this.handleNewTowerButton(tile, button);
+            this.handleNewTowerButtonClick(tile, button);
             break;
           case "traps":
             break;
@@ -177,33 +177,40 @@ export class RingMenu {
     });
   }
 
-  handleNewTowerButton(tile: Tile, button: SVGCircleElement) {
+  handleNewTowerButtonClick(tile: Tile, button: SVGCircleElement) {
     const towerType = button.dataset.type as TowerType;
-    const image = button.previousSibling?.firstChild?.firstChild as SVGImageElement;
-    const href = image.href.baseVal;
-    const color = TOWERS[towerType].fill;
-    // console.log("handleNewTowerButton", { href, towerType, color });
 
-    if (href.includes("check")) {
-      console.log("create the tower", tile, towerType);
-    } else {
-      const towerPos = { x: tile.pos.x + TILE_WIDTH / 2, y: tile.pos.y + TILE_WIDTH / 2 };
-      this.drawTowerPreview(towerPos, towerType);
-      // add/remove check icon
-      (this.#buttons || []).forEach(button => {
-        const buttonImg = document.querySelector(`#image-${button.id}`) as SVGImageElement;
-        const buttonType = button.dataset.type;
-
-        if (towerType === buttonType) {
-          buttonImg.setAttribute("href", `/assets/icons/check-${color}.svg`);
-          button.setAttribute("data-selected", "ok");
-        } else {
-          const btnIdx = RING_MENU_ICONS.newTower.findIndex(b => b.type === buttonType);
-          buttonImg.setAttribute("href", RING_MENU_ICONS.newTower[btnIdx].img);
-          button.getAttribute("data-selected") && button.removeAttribute("data-selected");
-        }
-      });
+    if (button.dataset.selected) {
+      this.removePreviewTower();
+      this.#removeRingButtons();
+      this.hide();
+      this.#game.createNewTower(tile, towerType); // create new tower
+      
+      return;
     }
+    // add/remove check icon
+    this.#handleCheckedButton(towerType);
+
+    const towerPos = { x: tile.pos.x + TILE_WIDTH / 2, y: tile.pos.y + TILE_WIDTH / 2 };
+    this.drawTowerPreview(towerPos, towerType);
+  }
+
+  #handleCheckedButton(towerType: TowerType) {
+    const color = TOWERS[towerType].fill;
+
+    (this.#buttons || []).forEach(button => {
+      const buttonImg = document.querySelector(`#image-${button.id}`) as SVGImageElement;
+      const buttonType = button.dataset.type;
+
+      if (towerType === buttonType) {
+        buttonImg.setAttribute("href", `/assets/icons/check-${color}.svg`);
+        button.setAttribute("data-selected", "ok");
+      } else {
+        const btnIdx = RING_MENU_ICONS.newTower.findIndex(b => b.type === buttonType);
+        buttonImg.setAttribute("href", RING_MENU_ICONS.newTower[btnIdx].img);
+        button.getAttribute("data-selected") && button.removeAttribute("data-selected");
+      }
+    });
   }
 
   drawTowerPreview(towerPos: Pos, towerType: TowerType) {
@@ -232,7 +239,10 @@ export class RingMenu {
     towerShape.setAttribute("height", String(TILE_WIDTH));
 
     towerShape.setAttribute("fill", `url(#${patternId})`);
-    towerShape.setAttribute("transform", `translate(50, -40) rotate(${90}, ${x}, ${y})`);
+    towerShape.setAttribute(
+      "transform",
+      `translate(${TILE_WIDTH * 0.5}, -${TILE_WIDTH * 0.4}) rotate(${90}, ${x}, ${y})`
+    );
 
     rangeCircle.setAttribute("id", `range-${tower_id}`);
     rangeCircle.classList.add("preview-range");

@@ -84,6 +84,22 @@ export function getAngle(sx: number, sy: number, ex: number, ey: number) {
   return theta;
 }
 
+
+export function getDistanceBetweenPoints(x1:number, y1:number, x2:number, y2:number) {
+  let y = x2 - x1;
+  let x = y2 - y1;
+
+  return Math.sqrt(x * x + y * y);
+}
+
+
+export const getDistanceBetweenAngles = (aDeg, bDeg) => {
+  return Math.abs(
+    Math.min(2 * Math.PI - Math.abs(aDeg - bDeg), Math.abs(aDeg - bDeg))
+  );
+};
+
+
 // export function drawPathEntrance(tile: Tile, points: Pos[], lane: EnemyLane) {
 //   if (!tile.isEnemyEntrance) return
 

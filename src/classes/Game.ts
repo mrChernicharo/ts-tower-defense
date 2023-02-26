@@ -8,11 +8,12 @@ import {
   stage_number_span,
   svg,
 } from "../lib/DOM_elements";
-import { drawPath } from "../lib/helpers";
+import { drawPath, getAngle, getDistanceBetweenAngles, getDistanceBetweenPoints } from "../lib/helpers";
 import { Clock } from "./Clock";
 import { Enemy } from "./Enemy";
-import { IconDirection } from "./RingMenu";
+import { IconDirection, TowerType } from "./RingMenu";
 import { Pos, Tile, TileType } from "./Tile";
+import { Tower } from "./Tower";
 import { WaveDefinition, WaveEnemy, WaveTimes } from "./WaveDefinition";
 
 type StageInfo = typeof STAGES_AND_WAVES[keyof typeof STAGES_AND_WAVES];
@@ -20,7 +21,7 @@ type StageInfo = typeof STAGES_AND_WAVES[keyof typeof STAGES_AND_WAVES];
 export class Game {
   tiles: Tile[];
   enemies: Enemy[] = [];
-  // tower: Tower[] = [];
+  towers: Tower[] = [];
   // bullets: Bullet[] = [];
   // bulletCount = 0;
   // towerPreviewActive = false;
@@ -290,6 +291,20 @@ export class Game {
     });
   }
 
+  createNewTower(tile: Tile, towerType: TowerType) {
+    this.#selectedTile = null;
+    this.#lastSelectedTile = null;
+
+    tile.hasTower = true;
+    tile.blur();
+
+    const towerPos = { x: tile.pos.x, y: tile.pos.y };
+    const tower = new Tower(towerPos, towerType);
+
+    this.towers.push(tower);
+    console.log("create the tower", { tile, towerType, tower });
+  }
+
   #onWaveStart() {
     console.log("onWaveStart init", {
       waveNumber: this.#waveNumber,
@@ -358,48 +373,45 @@ export class Game {
       });
     }
 
-    // console.log("loop update", this, { frame, time, counter });
-    {
-      // for (let tower of G.towers) {
-      //   let elapsedSinceLastShot = G.clock - tower.lastShot;
-      //   let farthestEnemy = null;
-      //   let greatestProgress = -Infinity;
-      //   let angle = null;
-      //   let distanceToEnemyInDeg = null;
-      //   for (let enemy of G.enemies) {
-      //     const d = getDistance(tower.pos.x, tower.pos.y, enemy.pos.x, enemy.pos.y);
-      //     const enemyInRange = d < tower.range;
-      //     if (enemyInRange) {
-      //       if (enemy.progress > greatestProgress) {
-      //         greatestProgress = enemy.progress;
-      //         farthestEnemy = enemy;
-      //       }
-      //     }
-      //   }
-      //   const targetEnemy = farthestEnemy; // or other strategies?
-      //   const diff = tower.cooldown - elapsedSinceLastShot;
-      //   const freshCooldown = tower.shotsPerSecond * 60;
-      //   if (targetEnemy) {
-      //     angle = getAngle(
-      //       tower.pos.x,
-      //       tower.pos.y,
-      //       targetEnemy.pos.x,
-      //       targetEnemy.pos.y
-      //     );
-      //     distanceToEnemyInDeg = getDistanceBetweenAngles(tower.rotation, angle);
-      //     tower.rotateTowardsEnemy(angle);
-      //   }
-      //   const enemyInSight = distanceToEnemyInDeg < 10;
-      //   if (tower.cooldown > 0) {
-      //     tower.cooldown = diff;
-      //   } else if (tower.cooldown <= 0 && targetEnemy && enemyInSight) {
-      //     // console.log("SHOOT!");
-      //     tower.cooldown = freshCooldown;
-      //     tower.lastShot = G.clock;
-      //     const newBullet = createBullet(tower, targetEnemy);
-      //     G.bullets.push(newBullet);
-      //   }
-      // }
+    for (let tower of this.towers) {
+      let elapsedSinceLastShot = this.#clock.time - tower.lastShot;
+      let farthestEnemy: Enemy | null = null;
+      let greatestProgress = -Infinity;
+      let angle: number | null = null;
+      let distanceToEnemyInDeg: number | null = null;
+
+      for (let enemy of this.enemies) {
+        const d = getDistanceBetweenPoints(tower.pos.x, tower.pos.y, enemy.pos.x, enemy.pos.y);
+        const enemyInRange = d < tower.range;
+        if (enemyInRange) {
+          if (enemy.progress > greatestProgress) {
+            greatestProgress = enemy.progress;
+            farthestEnemy = enemy;
+          }
+        }
+      }
+
+      const targetEnemy = farthestEnemy; // or other strategies?
+      const diff = tower.cooldown - elapsedSinceLastShot;
+      const freshCooldown = tower.shotsPerSecond * 60;
+      
+      if (targetEnemy) {
+        angle = getAngle(tower.pos.x, tower.pos.y, targetEnemy.pos.x, targetEnemy.pos.y);
+        distanceToEnemyInDeg = getDistanceBetweenAngles(tower.rotation, angle);
+        tower.rotateTowardsEnemy(angle);
+      }
+
+      const enemyInSight = distanceToEnemyInDeg !== null && distanceToEnemyInDeg < 10;
+      
+      if (tower.cooldown > 0) {
+        tower.cooldown = diff;
+      } else if (tower.cooldown <= 0 && targetEnemy && enemyInSight) {
+        console.log("SHOOT!");
+        tower.cooldown = freshCooldown;
+        tower.lastShot = this.#clock.time;
+        // const newBullet = createBullet(tower, targetEnemy);
+        // G.bullets.push(newBullet);
+      }
     }
 
     {
