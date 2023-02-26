@@ -88,7 +88,7 @@ export class Tile {
   constructor(
     id: string,
     index: number,
-    pos: Pos,
+    pos: Pos = { x: 0, y: 0 },
     type: TileType,
     waveline: number,
     isStartingPoint?: boolean,

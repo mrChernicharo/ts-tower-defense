@@ -338,7 +338,7 @@ export class Game {
     console.log("onWaveEnd after", { waveNumber: this.#waveNumber, waveTimes: this.waveTimes, time: this.#clock.time });
   }
 
-  #loopStep(frame: number, time: number, speed: number) {
+  #loopStep(time: number, speed: number) {
     if (this.#inBattle && this.currentWave.every(enemy => enemy.done)) {
       this.#onWaveEnd();
       return;
@@ -419,7 +419,9 @@ export class Game {
       // }
     }
 
-    for (let [i, enemy] of this.enemies.entries()) {
+    // console.log(this.enemies.map(e => JSON.stringify(e.pos)));
+
+    for (let enemy of this.enemies) {
       enemy.move(speed);
       //   // enemy.move(speed);
 

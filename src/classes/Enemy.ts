@@ -8,7 +8,8 @@ export class Enemy {
   #type: EnemyType;
   #id: string;
   #lane: SVGPathElement;
-  #shape: SVGCircleElement;
+  // #shape: SVGCircleElement;
+  #shape: SVGPolygonElement;
   #gold: number;
   #text: SVGTextElement;
   #hp: number;
@@ -16,7 +17,7 @@ export class Enemy {
   #size: number;
   #spawned = false;
   delay: number;
-  #pos: Pos;
+  #pos: Pos = { x: 0, y: 0 };
   done = false;
   rotation = -90;
   percProgress = 0;
@@ -28,7 +29,8 @@ export class Enemy {
     this.#id = `${type}-${generateUUID(16)}`;
     this.#type = type;
     this.#lane = enemy_lane_paths[lane];
-    this.#pos = pos;
+    this.#pos.x = pos.x;
+    this.#pos.y = pos.y;
     this.delay = delay;
     this.#hp = hp;
     this.#gold = gold;
@@ -36,8 +38,7 @@ export class Enemy {
     this.#fill = fill;
     this.#size = size;
 
-    // this.#shape = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-    this.#shape = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    this.#shape = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
     this.#text = document.createElementNS("http://www.w3.org/2000/svg", "text");
     this.#shape.setAttribute("id", this.#id);
 
@@ -52,6 +53,9 @@ export class Enemy {
   }
   get type() {
     return this.#type;
+  }
+  get pos() {
+    return this.#pos;
   }
   get fill() {
     return this.#fill;
@@ -69,8 +73,11 @@ export class Enemy {
     this.#shape.setAttribute("data-entity", "enemy");
     this.#shape.setAttribute("fill", this.fill);
     this.#shape.setAttribute("r", String(this.#size));
-    this.#shape.setAttribute("cx", String(this.#pos.x));
-    this.#shape.setAttribute("cy", String(this.#pos.y));
+    this.#shape.setAttribute("points", this.getPoints());
+    this.#shape.setAttribute("style", "transform-box: fill-box; transform-origin: center");
+    this.#shape.setAttribute("transform", `translate(0,0) rotate(${this.rotation})`);
+    // this.#shape.setAttribute("cx", String(this.#pos.x));
+    // this.#shape.setAttribute("cy", String(this.#pos.y));
 
     this.#text.setAttribute("x", String(this.#pos.x));
     this.#text.setAttribute("y", String(this.#pos.y + 15));
@@ -84,20 +91,26 @@ export class Enemy {
   }
 
   move(gameSpeed: number) {
-    const prog = this.#lane.getTotalLength() - (this.#lane.getTotalLength() - (this.progress + this.speed * gameSpeed * 0.1));
+    const prog =
+      this.#lane.getTotalLength() - (this.#lane.getTotalLength() - (this.progress + this.speed * gameSpeed * 0.1));
     const { x, y } = this.#lane.getPointAtLength(this.#lane.getTotalLength() - prog);
 
     // update enemies' progress
     this.progress = prog;
     this.percProgress = (prog / this.#lane.getTotalLength()) * 100;
+
+    this.rotation = getAngle(this.#pos.x, this.#pos.y, x, y);
+
     this.#pos.x = x;
     this.#pos.y = y;
 
-    this.#shape.setAttribute("cx", String(this.#pos.x));
-    this.#shape.setAttribute("cy", String(this.#pos.y));
+    this.#shape.setAttribute("points", this.getPoints());
 
-    this.#text.setAttribute("x", String(this.#pos.x));
-    this.#text.setAttribute("y", String(this.#pos.y));
+    this.#text.setAttribute("x", String(x));
+    this.#text.setAttribute("y", String(y));
+
+    this.#shape.setAttribute("transform", `rotate(${this.rotation})`);
+
     this.#text.textContent = this.hp.toFixed(0);
   }
 
@@ -109,7 +122,7 @@ export class Enemy {
       { x: x - this.#size, y: y - this.#size },
       { x: x + this.#size * 2, y },
     ];
-    return points.map(p => `${parseInt(String(p.x))} ${parseInt(String(p.y))} `).join("");
+    return points.map(p => `${p.x} ${p.y} `).join("");
   }
 
   spawn() {

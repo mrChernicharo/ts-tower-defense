@@ -33,15 +33,15 @@ export class Clock {
 
   changeSpeed(speed: 1 | 2 | 4) {
     this.#speed = speed;
-    console.log('changed speed', speed)
+    console.log("changed speed", speed);
   }
 
   step() {
-    const timeIncrement = frameTime * this.#speed / 1000;
-    this.#time += timeIncrement
+    const timeIncrement = (frameTime * this.#speed) / 1000;
+    this.#time += timeIncrement;
 
     if (this.isPlaying) {
-      this.callback(this.#frame, this.#time, this.#speed);
+      this.callback(this.#time, this.#speed);
 
       this.#frame = requestAnimationFrame(() => this.step());
     }
